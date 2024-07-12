@@ -20,7 +20,7 @@ const ForgotPassword = () => {
         <MDBRow className='flex justify-content-between' style={{borderRadius: 30}}>
 
           <MDBCol md='6' style={{marginLeft: "3%"}}>
-            <MDBCardBody className='d-flex flex-column align-items-center'>
+            <MDBCardBody className='d-flex flex-column align-items-center mt-4'>
 
               <div className='d-flex flex-row justify-content-center mt-2 mb-5'>
                 <MDBIcon fas icon="umbrella-beach fa-3x me-3" style={{ color: '#04b4bd' }}/>
@@ -29,7 +29,9 @@ const ForgotPassword = () => {
 
               <div className='w-80 mt-5'>
 
-                <p className="fw-normal my-4">Forgot your password?</p>
+                <div className='mb-4'>
+                    <span className="h3 fw-normal mt-4">Forgot your password?</span>
+                </div>
 
                 <MDBInput wrapperClass='mb-4' label='Email address' id='formControlLgEmail' type='email' size="lg"/>
                 

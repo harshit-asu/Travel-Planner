@@ -24,15 +24,17 @@ const Signup = () => {
                         <MDBCardImage src={login_page} alt="login form" className='w-100' style={{ borderRadius: 30 }} />
                     </MDBCol>
 
-                    <MDBCol md='6' style={{ marginLeft: "3%" }}>
-                        <MDBCardBody className='d-flex flex-column align-items-center'>
+                    <MDBCol md='6' style={{ marginLeft: "3%"}}>
+                        <MDBCardBody className='d-flex flex-column align-items-center mt-4'>
 
                             <div className='d-flex flex-row justify-content-center mt-2 mb-2'>
                                 <MDBIcon fas icon="umbrella-beach fa-3x me-3" style={{ color: '#04b4bd' }} />
                                 <span className="h1 fw-bold mb-0">Travel Planner</span>
                             </div>
-                            <span className="h2 fw-bold mt-3">Sign up</span>
                             <form className='w-80 mt-4'>
+                                <div className='mb-4'>
+                                    <span className="h3 fw-normal mt-4">Sign up</span>
+                                </div>
                                 <MDBRow className='mb-4'>
                                     <MDBCol>
                                         <MDBInput id='form3Example1' label='First name' size='lg' />

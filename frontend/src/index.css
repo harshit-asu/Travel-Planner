@@ -3,10 +3,11 @@
 @tailwind utilities; */
 
 body {
-    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
 }
 
 .btn-custom {
     background-color: #04b4bd !important;
     color: black !important;
+    border-color: #04b4bd;
 }
