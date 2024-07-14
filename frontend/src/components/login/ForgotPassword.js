@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import {
     MDBBtn,
     MDBContainer,
@@ -13,6 +14,20 @@ import {
 import login_page from '../../assets/login_page.jpg'
 
 const ForgotPassword = () => {
+
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/forgot-password', { email });
+      setMessage(response.data.msg);
+    } catch (error) {
+      setMessage(error.response.data.msg || 'Invalid request');
+    }
+  };
+
   return (
     <MDBContainer className="my-5">
 
@@ -27,18 +42,20 @@ const ForgotPassword = () => {
                 <span className="h1 fw-bold mb-0">Travel Planner</span>
               </div>
 
-              <div className='w-80 mt-5'>
+              <form className='w-80 mt-5' onSubmit={handleSubmit}>
 
                 <div className='mb-4'>
                     <span className="h3 fw-normal mt-4">Forgot your password?</span>
                 </div>
 
-                <MDBInput wrapperClass='mb-4' label='Email address' id='formControlLgEmail' type='email' size="lg"/>
+                <p>{message}</p>
+
+                <MDBInput wrapperClass='mb-4' label='Email address' id='formControlLgEmail' type='email' size="lg" value={email} onChange={(e) => setEmail(e.target.value)} />
                 
 
-                <MDBBtn className="mb-4 px-5 btn-custom" size="md">Submit</MDBBtn>
+                <MDBBtn type='submit' className="mb-4 px-5 btn-custom" size="md">Submit</MDBBtn>
               
-              </div>
+              </form>
 
             </MDBCardBody>
           </MDBCol>

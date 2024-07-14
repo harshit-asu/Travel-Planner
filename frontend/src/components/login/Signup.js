@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import {
     MDBBtn,
     MDBContainer,
@@ -8,12 +9,29 @@ import {
     MDBRow,
     MDBCol,
     MDBIcon,
-    MDBInput,
-    MDBCheckbox
+    MDBInput
 } from 'mdb-react-ui-kit';
 import login_page from '../../assets/login_page.jpg'
 
 const Signup = () => {
+
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const response = await axios.post('http://127.0.0.1:5000/signup', { firstName, lastName, email, password });
+          setMessage(response.data.msg);
+        } catch (error) {
+          setMessage(error.response.data.msg || 'Registration failed');
+        }
+    };
+    
+
     return (
         <MDBContainer className="my-5">
 
@@ -31,20 +49,21 @@ const Signup = () => {
                                 <MDBIcon fas icon="umbrella-beach fa-3x me-3" style={{ color: '#04b4bd' }} />
                                 <span className="h1 fw-bold mb-0">Travel Planner</span>
                             </div>
-                            <form className='w-80 mt-4'>
+                            <form className='w-80 mt-4' onSubmit={handleSubmit}>
                                 <div className='mb-4'>
                                     <span className="h3 fw-normal mt-4">Sign up</span>
                                 </div>
+                                <h1>{message}</h1>
                                 <MDBRow className='mb-4'>
                                     <MDBCol>
-                                        <MDBInput id='form3Example1' label='First name' size='lg' />
+                                        <MDBInput id='form3Example1' label='First name' size='lg' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                                     </MDBCol>
                                     <MDBCol>
-                                        <MDBInput id='form3Example2' label='Last name' size='lg' />
+                                        <MDBInput id='form3Example2' label='Last name' size='lg' value={lastName} onChange={(e) => setLastName(e.target.value)} />
                                     </MDBCol>
                                 </MDBRow>
-                                <MDBInput className='mb-4' type='email' id='form3Example3' label='Email address' size='lg' />
-                                <MDBInput className='mb-4' type='password' id='form3Example4' label='Password' size='lg' />
+                                <MDBInput className='mb-4' type='email' id='form3Example3' label='Email address' size='lg' value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <MDBInput className='mb-4' type='password' id='form3Example4' label='Password' size='lg' value={password} onChange={(e) => setPassword(e.target.value)} />
 
                                 <MDBBtn type='submit' className="mb-4 px-5 btn-custom" size="md">Sign in</MDBBtn>
 

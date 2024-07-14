@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     MDBBtn,
     MDBContainer,
@@ -11,8 +11,28 @@ import {
     MDBInput
   } from 'mdb-react-ui-kit';
 import login_page from '../../assets/login_page.jpg'
+import axios from 'axios';
 
 const Login = () => {
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] =  useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(email, password);
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/login', { email, password });
+      console.log(response);
+      // setToken(response.data.access_token);
+      setMessage('Login successful');
+    } catch (error) {
+      setMessage(error.response.data.msg || 'Login failed');
+    }
+  };
+
+
   return (
     <MDBContainer className="my-5">
 
@@ -31,17 +51,20 @@ const Login = () => {
                 <span className="h1 fw-bold mb-0">Travel Planner</span>
               </div>
 
-              <form className='w-50 mt-4'>
+              <form className='w-50 mt-4' onSubmit={handleSubmit}>
                 <div className='mb-4'>
                     <span className="h3 fw-normal mt-4">Login</span>
                 </div>
-                <MDBInput wrapperClass='mb-4' label='Email address' id='formControlLgEmail' type='email' size="lg"/>
-                <MDBInput label='Password' id='formControlLgPassword' type='password' size="lg"/>
+
+                <p>{message}</p>
+
+                <MDBInput wrapperClass='mb-4' label='Email address' id='formControlLgEmail' type='email' size="lg" value={email} onChange={(event) => {setEmail(event.target.value)}} />
+                <MDBInput label='Password' id='formControlLgPassword' type='password' size="lg" value={password} onChange={(event) => setPassword(event.target.value)}  />
                 <div className='mb-4 text-end mt-1'>
                     <a className="small fw-light" style={{color: '#04b4bd'}} href="/forgot-password">Forgot password?</a>
                 </div>
 
-                <MDBBtn type="submit" className="mb-4 px-5 btn-custom w-100" size="md">Login</MDBBtn>
+                <MDBBtn type="submit" className="mb-4 px-5 btn-custom w-100" size="md" >Login</MDBBtn>
               
               </form>
 
