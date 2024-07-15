@@ -5,8 +5,10 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime
+import random
+from emails.send import send_verification_email
 
-from models import db, User, Trip, People
+from models import db, User, Trip, People, VerificationCode
 
 
 app = Flask(__name__)
@@ -35,9 +37,20 @@ def signup():
     new_user = User(firstName=firstName,lastName=lastName, email=email, created_at=datetime.astimezone())
     new_user.set_password(password)
     db.session.add(new_user)
-    db.session.commit()
+
     #TODO: send an email with verification code
-    return jsonify({"msg": "User signed up successfully"}), 201
+    code = random.randint(1000, 9999)
+    new_verification_code = VerificationCode(code=code, user_id=new_user.id)
+    db.session.add(new_verification_code)
+    db.session.commit()
+
+    # send email
+    send_verification_email(code=new_verification_code.code, username=f'{firstName} {lastName}', email=email)
+
+    return jsonify({
+        "msg": "User signed up successfully",
+        "verification_id": new_verification_code.id
+    }), 201
 
 
 @app.route('/login', methods=['POST'])

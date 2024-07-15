@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
+import uuid
 
 Base = declarative_base()
 
@@ -20,6 +21,7 @@ class User(db.Model):
 
     trip = relationship('Trip', cascade="all, delete", back_populates='user')
     user_people = relationship('People', cascade="all, delete", back_populates='people_user')
+    user_verification_code = relationship('VerificationCode', cascade='all, delete', back_populates='verification_code_user')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -65,6 +67,10 @@ class Activity(db.Model):
     activity_trip = relationship('Trip', back_populates='trip_activity')
 
 
+class VerificationCode(db.Model):
+    __tablename__ = "verification_code"
+    id = db.Column(db.Integer, primary_key=True, default=lambda: uuid.uuid4().int >> (128 - 32), unique=True)
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    code = db.Column(db.Integer)
 
-
-     
+    verification_code_user = relationship('User', back_populates='user_verification_code')
