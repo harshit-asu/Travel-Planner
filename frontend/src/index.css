@@ -8,6 +8,10 @@ body {
 
 .btn-custom {
     background-color: #04b4bd !important;
-    color: black !important;
+    color: white !important;
     border-color: #04b4bd;
+}
+.notrips{
+    height: 50 !important;
+    width: 30% !important;
 }
