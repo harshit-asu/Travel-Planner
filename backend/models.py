@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
 import uuid
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -17,7 +18,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
 
     trip = relationship('Trip', cascade="all, delete", back_populates='user')
     user_people = relationship('People', cascade="all, delete", back_populates='people_user')

@@ -34,7 +34,7 @@ def signup():
     if User.query.filter_by(email=email).first() is not None:
         return jsonify({"msg": "Email already registered"}), 400
 
-    new_user = User(firstName=firstName,lastName=lastName, email=email, created_at=datetime.astimezone())
+    new_user = User(firstName=firstName,lastName=lastName, email=email)
     new_user.set_password(password)
     db.session.add(new_user)
 
@@ -44,13 +44,23 @@ def signup():
     db.session.add(new_verification_code)
     db.session.commit()
 
-    # send email
-    send_verification_email(code=new_verification_code.code, username=f'{firstName} {lastName}', email=email)
-
     return jsonify({
         "msg": "User signed up successfully",
         "verification_id": new_verification_code.id
     }), 201
+
+    # send email
+    # if send_verification_email(code=new_verification_code.code, username=f'{firstName} {lastName}', to_email=email):
+    #     db.session.commit()
+
+    #     return jsonify({
+    #         "msg": "User signed up successfully",
+    #         "verification_id": new_verification_code.id
+    #     }), 201
+
+    # return jsonify({
+    #     "msg": "Something went wrong"
+    # }), 400
 
 
 @app.route('/login', methods=['POST'])
@@ -151,8 +161,6 @@ def delete_trip(trip_id):
 
     if trip is None:
         return jsonify({"msg": "Trip not found"}), 404
-
-    #TODO: check how to take care of dependencies (dependent records should also be deleted)
 
     db.session.delete(trip)
     db.session.commit()

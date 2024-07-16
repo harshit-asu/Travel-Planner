@@ -14,3 +14,7 @@ build/
 *.egg-info/
 
 migrations/
+
+emails/.env
+
+travelplanner_database.db
