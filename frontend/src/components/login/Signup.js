@@ -15,8 +15,8 @@ import login_page from '../../assets/login_page.jpg'
 
 const Signup = () => {
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const [first_name, setfirst_name] = useState("");
+    const [last_name, setlast_name] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -24,7 +24,7 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          const response = await axios.post('http://127.0.0.1:5000/signup', { firstName, lastName, email, password });
+          const response = await axios.post('http://127.0.0.1:5000/signup', { first_name, last_name, email, password });
           setMessage(response.data.msg);
         } catch (error) {
           setMessage(error.response.data.msg || 'Registration failed');
@@ -56,10 +56,10 @@ const Signup = () => {
                                 <h1>{message}</h1>
                                 <MDBRow className='mb-4'>
                                     <MDBCol>
-                                        <MDBInput id='form3Example1' label='First name' size='lg' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                                        <MDBInput id='form3Example1' label='First name' size='lg' value={first_name} onChange={(e) => setfirst_name(e.target.value)} />
                                     </MDBCol>
                                     <MDBCol>
-                                        <MDBInput id='form3Example2' label='Last name' size='lg' value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                                        <MDBInput id='form3Example2' label='Last name' size='lg' value={last_name} onChange={(e) => setlast_name(e.target.value)} />
                                     </MDBCol>
                                 </MDBRow>
                                 <MDBInput className='mb-4' type='email' id='form3Example3' label='Email address' size='lg' value={email} onChange={(e) => setEmail(e.target.value)} />
