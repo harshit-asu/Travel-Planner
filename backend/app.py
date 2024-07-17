@@ -20,7 +20,7 @@ app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 from models import *
 
 db.init_app(app=app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, render_as_batch=True)
 
 # Define error messages
 error_messages = {
@@ -433,14 +433,14 @@ def invite_to_trip(trip_id):
         if existing_member:
             return jsonify({'message': 'User is already a member of this trip'}), 200
         
-        invitation_exists = TripInvitation.query.filter_by(trip_id=trip_id, sent_to_user_id=data['invitee_id']).first()
+        invitation_exists = TripInvitation.query.filter_by(trip_id=trip_id, receiver_id=data['invitee_id']).first()
         if invitation_exists:
             return jsonify({"message": "Invitation already exists"}), 200
 
         new_invitation = TripInvitation(
             trip_id=trip_id,
-            sent_by_user_id=g.current_user_id,
-            sent_to_user_id=data['invitee_id']
+            sender_id=g.current_user_id,
+            receiver_id=data['invitee_id']
         )
         db.session.add(new_invitation)
         db.session.commit()
@@ -465,7 +465,7 @@ def invite_to_trip(trip_id):
 def accept_invitation(invitation_id):
     try:
         invitation = TripInvitation.query.filter_by(invitation_id=invitation_id)
-        if not invitation or invitation.sent_to_user_id != g.current_user_id:
+        if not invitation or invitation.receiver_id != g.current_user_id:
             abort(404)
 
         # invitation expired
@@ -609,7 +609,7 @@ def add_destination(trip_id):
             destination_name=data['destination_name'],
             arrival=datetime.strptime(data['arrival'], '%Y-%m-%dT%H:%M:%S') if data.get('arrival') else None,
             departure=datetime.strptime(data['departure'], '%Y-%m-%dT%H:%M:%S') if data.get('departure') else None,
-            notes=data.get('notes'),
+            description=data.get('description'),
             place_id=data.get('place_id')
         )
         db.session.add(new_destination)
@@ -634,7 +634,7 @@ def get_destinations(trip_id):
         return jsonify({'destinations': [{
             "destination_id": d.destination_id,
             "destination_name": d.destination_name,
-            "notes": d.notes,
+            "description": d.description,
             "place_id": d.place_id,
             "arrival": d.arrival,
             "departure": d.departure
@@ -664,7 +664,7 @@ def update_destination(destination_id):
         destination.destination_name = data.get('destination_name', destination.destination_name)
         destination.arrival = datetime.strptime(data.get('arrival'), '%Y-%m-%dT%H:%M:%S') if data.get('arrival') else destination.arrival
         destination.departure = datetime.strptime(data.get('departure'), '%Y-%m-%dT%H:%M:%S') if data.get('departure') else destination.departure
-        destination.notes = data.get('notes', destination.notes)
+        destination.description = data.get('description', destination.description)
 
         db.session.commit()
         return jsonify({'message': 'Destination updated successfully', 'destination_id': destination.destination_id}), 200
@@ -710,7 +710,7 @@ def add_activity(destination_id):
             activity_name=data['activity_name'],
             start_time=datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S') if data.get('start_time') else None,
             end_time=datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S') if data.get('end_time') else None,
-            notes=data.get('notes')
+            description=data.get('description')
         )
         db.session.add(new_activity)
         db.session.commit()
@@ -758,7 +758,7 @@ def update_activity(activity_id):
         activity.activity_name = data.get('activity_name', activity.activity_name)
         activity.start_time = datetime.strptime(data.get('start_time'), '%Y-%m-%dT%H:%M:%S') if data.get('start_time') else activity.start_time
         activity.end_time = datetime.strptime(data.get('end_time'), '%Y-%m-%dT%H:%M:%S') if data.get('end_time') else activity.end_time
-        activity.notes = data.get('notes', activity.notes)
+        activity.description = data.get('description', activity.description)
 
         db.session.commit()
         return jsonify({'message': 'Activity updated successfully', 'activity_id': activity.activity_id}), 200
@@ -807,7 +807,7 @@ def add_transport(trip_id):
             departure_time=datetime.strptime(data['departure_time'], '%Y-%m-%dT%H:%M:%S') if data.get('departure_time') else None,
             arrival_time=datetime.strptime(data['arrival_time'], '%Y-%m-%dT%H:%M:%S') if data.get('arrival_time') else None,
             cost=data.get('cost'),
-            notes=data.get('notes')
+            description=data.get('description')
         )
         db.session.add(new_transport)
         db.session.commit()
@@ -835,7 +835,7 @@ def get_transport(trip_id):
             "departure_time": t.departure_time,
             "arrival_time": t.arrival_time,
             "cost": t.cost,
-            "notes": t.notes
+            "description": t.description
         } for t in transport]}), 200
     
     except SQLAlchemyError as e:
@@ -861,7 +861,7 @@ def update_transport(transport_id):
         transport.departure_time = datetime.strptime(data.get('departure_time'), '%Y-%m-%dT%H:%M:%S') if data.get('departure_time') else transport.departure_time
         transport.arrival_time = datetime.strptime(data.get('arrival_time'), '%Y-%m-%dT%H:%M:%S') if data.get('arrival_time') else transport.arrival_time
         transport.cost = data.get('cost', transport.cost)
-        transport.notes = data.get('notes', transport.notes)
+        transport.description = data.get('description', transport.description)
 
         db.session.commit()
 
@@ -910,7 +910,7 @@ def add_accommodation(trip_id):
             check_in=datetime.strptime(data['check_in'], '%Y-%m-%dT%H:%M:%S') if data.get('check_in') else None,
             check_out=datetime.strptime(data['check_out'], '%Y-%m-%dT%H:%M:%S') if data.get('check_out') else None,
             cost=data.get('cost'),
-            notes=data.get('notes')
+            description=data.get('description')
         )
         db.session.add(new_accommodation)
         db.session.commit()
@@ -938,7 +938,7 @@ def get_accommodations(trip_id):
             "check_in": a.check_in,
             "check_out": a.check_out,
             "cost": a.cost,
-            "notes": a.notes
+            "description": a.description
         } for a in accommodations]}), 200
     
     except SQLAlchemyError as e:
@@ -963,7 +963,7 @@ def update_accommodation(accommodation_id):
         accommodation.check_in = datetime.strptime(data.get('check_in'), '%Y-%m-%dT%H:%M:%S') if data.get('check_in') else accommodation.check_in
         accommodation.check_out = datetime.strptime(data.get('check_out'), '%Y-%m-%dT%H:%M:%S') if data.get('check_out') else accommodation.check_out
         accommodation.cost = data.get('cost', accommodation.cost)
-        accommodation.notes = data.get('notes', accommodation.notes)
+        accommodation.description = data.get('description', accommodation.description)
 
         db.session.commit()
 

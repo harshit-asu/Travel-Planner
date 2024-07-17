@@ -16,18 +16,18 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
     is_verified = db.Column(db.Boolean, default=False)
-    role = db.Column(db.String(255), default='user')
+    role = db.Column(db.String(255), default='user')    # role can be 'admin', 'user'
     phone_number = db.Column(db.String(255))
     profile_picture = db.Column(db.String(255))
 
     # Define relationships
-    trips_created = db.relationship('Trip', backref='creator', lazy=True)
-    trip_memberships = db.relationship('TripMember', backref='user', lazy=True)
-    invitations_sent = db.relationship('TripInvitation', foreign_keys='TripInvitation.sent_by_user_id', backref='sender', lazy=True)
-    invitations_received = db.relationship('TripInvitation', foreign_keys='TripInvitation.sent_to_user_id', backref='recipient', lazy=True)
+    trips_created = db.relationship('Trip', cascade="all,delete", backref='creator', lazy=True)
+    trip_memberships = db.relationship('TripMember', cascade="all,delete", backref='user', lazy=True)
+    invitations_sent = db.relationship('TripInvitation', cascade="all,delete", foreign_keys='TripInvitation.sender_id', backref='sender', lazy=True)
+    invitations_received = db.relationship('TripInvitation', cascade="all,delete", foreign_keys='TripInvitation.receiver_id', backref='recipient', lazy=True)
     # reviews = db.relationship('Review', backref='author', lazy=True)
-    notifications = db.relationship('Notification', backref='recipient', lazy=True)
-    emergency_contacts = db.relationship('EmergencyContact', backref='user', lazy=True)
+    notifications = db.relationship('Notification', cascade="all,delete", backref='recipient', lazy=True)
+    # emergency_contacts = db.relationship('EmergencyContact',  backref='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -44,17 +44,17 @@ class Trip(db.Model):
     trip_name = db.Column(db.String(255), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
-    budget = db.Column(db.DECIMAL(10, 2))
+    budget = db.Column(db.Numeric(10, 2))
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
     # Define relationships
-    trip_members = db.relationship('TripMember', backref='trip', lazy=True)
-    invitations = db.relationship('TripInvitation', backref='trip', lazy=True)
-    expenses = db.relationship('Expense', backref='trip', lazy=True)
-    transports = db.relationship('Transport', backref='trip', lazy=True)
-    accommodations = db.relationship('Accommodation', backref='trip', lazy=True)
-    packing_list = db.relationship('PackingList', backref='trip', lazy=True)
+    trip_members = db.relationship('TripMember', cascade="all,delete", backref='trip', lazy=True)
+    invitations = db.relationship('TripInvitation', cascade="all,delete", backref='trip', lazy=True)
+    expenses = db.relationship('Expense', cascade="all,delete", backref='trip', lazy=True)
+    transports = db.relationship('Transport', cascade="all,delete", backref='trip', lazy=True)
+    accommodations = db.relationship('Accommodation', cascade="all,delete", backref='trip', lazy=True)
+    packing_list = db.relationship('PackingList', cascade="all,delete", backref='trip', lazy=True)
 
 
 class TripMember(db.Model):
@@ -64,12 +64,12 @@ class TripMember(db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey('trips.trip_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     role = db.Column(db.String(255), default='member')
-    total_expenses = db.Column(db.DECIMAL(10, 2))
+    total_expenses = db.Column(db.Numeric(10, 2))
     joined_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
     # Define relationships
-    expenses = db.relationship('Expense', backref='payer', lazy=True)
-    expense_splits = db.relationship('ExpenseSplit', backref='trip_member', lazy=True)
+    expenses = db.relationship('Expense', cascade="all,delete", backref='payer', lazy=True)
+    expense_splits = db.relationship('ExpenseSplit', cascade="all,delete", backref='trip_member', lazy=True)
 
 
 class TripInvitation(db.Model):
@@ -77,8 +77,8 @@ class TripInvitation(db.Model):
 
     trip_invitation_id = db.Column(db.Integer, primary_key=True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trips.trip_id'))
-    sent_to_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    sent_by_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     invitation_sent_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     expiry_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now() + db.func.interval('1 week'))
 
@@ -92,9 +92,10 @@ class Place(db.Model):
     description = db.Column(db.Text)
     category = db.Column(db.String(255))
     opening_hours = db.Column(db.String(255))
-    entry_fee = db.Column(db.DECIMAL(10, 2))
+    entry_fee = db.Column(db.Numeric(10, 2))
     website = db.Column(db.String(255))
     contact_info = db.Column(db.String(255))
+    picture = db.Column(db.Text, default='')
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
@@ -109,13 +110,13 @@ class Destination(db.Model):
     place_id = db.Column(db.Integer, db.ForeignKey('places.place_id'))
     arrival = db.Column(db.DateTime(timezone=True))
     departure = db.Column(db.DateTime(timezone=True))
-    notes = db.Column(db.Text)
+    description = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
     # Define relationships
-    accommodations = db.relationship('Accommodation', backref='destination', lazy=True)
-    activities = db.relationship('Activity', backref='destination', lazy=True)
+    accommodations = db.relationship('Accommodation', cascade="all,delete", backref='destination', lazy=True)
+    activities = db.relationship('Activity', cascade="all,delete", backref='destination', lazy=True)
 
 
 class Expense(db.Model):
@@ -125,14 +126,14 @@ class Expense(db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey('trips.trip_id'))
     paid_by = db.Column(db.Integer, db.ForeignKey('trip_members.trip_member_id'))
     category = db.Column(db.String(255))
-    amount = db.Column(db.DECIMAL(10, 2))
+    amount = db.Column(db.Numeric(10, 2))
     expense_date = db.Column(db.Date, server_default=db.func.current_date())
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
     # Define relationships
-    splits = db.relationship('ExpenseSplit', backref='expense', lazy=True)
+    splits = db.relationship('ExpenseSplit', cascade="all,delete", backref='expense', lazy=True)
 
 
 class ExpenseSplit(db.Model):
@@ -141,7 +142,7 @@ class ExpenseSplit(db.Model):
     expense_split_id = db.Column(db.Integer, primary_key=True)
     expense_id = db.Column(db.Integer, db.ForeignKey('expenses.expense_id'))
     trip_member_id = db.Column(db.Integer, db.ForeignKey('trip_members.trip_member_id'))
-    amount = db.Column(db.DECIMAL(10, 2), nullable=False)
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
@@ -154,7 +155,7 @@ class Activity(db.Model):
     activity_name = db.Column(db.String(255), nullable=False)
     start_time = db.Column(db.DateTime(timezone=True))
     end_time = db.Column(db.DateTime(timezone=True))
-    notes = db.Column(db.Text)
+    description = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
@@ -169,8 +170,8 @@ class Transport(db.Model):
     arrival_location = db.Column(db.String(255))
     departure_time = db.Column(db.DateTime(timezone=True))
     arrival_time = db.Column(db.DateTime(timezone=True))
-    cost = db.Column(db.DECIMAL(10, 2))
-    notes = db.Column(db.Text)
+    cost = db.Column(db.Numeric(10, 2))
+    description = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
@@ -185,8 +186,8 @@ class Accommodation(db.Model):
     address = db.Column(db.Text)
     check_in = db.Column(db.DateTime(timezone=True))
     check_out = db.Column(db.DateTime(timezone=True))
-    cost = db.Column(db.DECIMAL(10, 2))
-    notes = db.Column(db.Text)
+    cost = db.Column(db.Numeric(10, 2))
+    description = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
 
@@ -225,13 +226,13 @@ class Notification(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
 
-class EmergencyContact(db.Model):
-    __tablename__ = 'emergency_contacts'
+# class EmergencyContact(db.Model):
+#     __tablename__ = 'emergency_contacts'
 
-    contact_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    name = db.Column(db.String(255), nullable=False)
-    phone_number = db.Column(db.String(255), nullable=False)
-    relationship = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
-    updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
+#     contact_id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+#     name = db.Column(db.String(255), nullable=False)
+#     phone_number = db.Column(db.String(255), nullable=False)
+#     relationship = db.Column(db.String(255))
+#     created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+#     updated_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), onupdate=db.func.now())
