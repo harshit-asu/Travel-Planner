@@ -15,6 +15,7 @@ build/
 
 migrations/
 
+.env
 emails/.env
 
 travelplanner_database.db
