@@ -15,3 +15,22 @@ body {
     height: 50 !important;
     width: 30% !important;
 }
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: white !important;
+    border-color: #04b4bd !important;
+    background-color: #04b4bd !important;
+}
+
+.nav-tabs .nav-link {
+    border: 1px solid #04b4bd !important;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.dropdown-custom {
+    background: transparent !important;
+    box-shadow: none !important;
+}

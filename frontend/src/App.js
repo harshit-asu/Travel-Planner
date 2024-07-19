@@ -9,11 +9,12 @@ import TripList from './components/trips/TripList';
 import Header from './components/Header';
 import Trip from './components/trips/Trip';
 import Filter from './components/trips/Filter';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <div>
-      <Header />
+      <Navbar/>
       <Router>
         <div className="App">
           <Routes>

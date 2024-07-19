@@ -1,6 +1,5 @@
-import React from "react";
+import React, {useState} from "react";
 import {
-  MDBBadge,
   MDBCard,
   MDBCardBody,
   MDBCardHeader,
@@ -8,215 +7,128 @@ import {
   MDBContainer,
   MDBIcon,
   MDBRow,
-//   MDBScrollbar,
-  MDBTable,
-  MDBTableBody,
-  MDBTableHead,
-  MDBTooltip,
   MDBBtn,
+  MDBTabs,
+  MDBTabsItem,
+  MDBTabsLink,
+  MDBTabsContent,
+  MDBTabsPane
 } from "mdb-react-ui-kit";
-import Filter from "./Filter";
-import NoTrips from './NoTrips';
+import TripListItem from "../Trip/TripListItem";
+import AddTrip from "../Trip/AddTrip";
+
 
 const TripList = () => {
+  const [basicActive, setBasicActive] = useState('Upcoming Trips');
+
+  const [openAddTripModal, setOpenAddTripModal] = useState(false);
+
+  const handleBasicClick = (value) => {
+    if (value === basicActive) {
+      return;
+    }
+
+    setBasicActive(value);
+  };
+
+  const closeAddTripModal = () => {
+    setOpenAddTripModal(false);
+  }
+
   return (
     // <NoTrips />
-    <MDBRow className="m-2 mt-0">
-      <MDBCol md={3}>
-        <Filter/>
-      </MDBCol>
-      <MDBCol md={9}>
-      <section className="gradient-custom-2 vh-100 ">
-      <MDBContainer className="py-4 h-100 ">
-        <MDBRow className="d-flex justify-content-start">
-          <MDBCol md="12" xl="10" className="w-100">
-            <MDBCard>
-              <MDBCardHeader className="p-3 ">
-                <MDBRow>
+        <MDBContainer fluid className="vh-100 mt-3">
+              <MDBCard >
+                <MDBCardHeader className="p-3">
+                  <MDBRow>
                     <MDBCol md={8} className="d-flex flex-column justify-content-center">
-                        <h4 className="mb-0 ms-4" style={{color: '#04b4bd'}}>
-                            {/* <MDBIcon fas icon="chevron-right" className="me-2" /> */}
-                            <strong>Seattle</strong>
-                        </h4>
+                      <h4 className="mb-0 ms-4 ps-2" style={{ color: '#04b4bd' }}>
+                        {/* <MDBIcon fas icon="chevron-right" className="me-2" /> */}
+                        <strong>My Trips (10)</strong>
+                      </h4>
                     </MDBCol>
-                    <MDBCol md={4} className="d-flex justify-content-center">
-                        <MDBBtn className="mb-0 px-5 btn-custom " size="md">Add Trip</MDBBtn>
+                    <MDBCol md={4} className="d-flex justify-content-end pe-5">
+                      <MDBBtn className="mb-0 px-5 btn-custom " size="md" onClick={() => setOpenAddTripModal(true)}>Add Trip</MDBBtn>
+                      <AddTrip open={openAddTripModal} close={closeAddTripModal} />
                     </MDBCol>
-                </MDBRow>
-              </MDBCardHeader>
-              {/* <MDBScrollbar style={{ position: "relative", height: "400px" }}> */}
+                  </MDBRow>
+                </MDBCardHeader>
+                {/* <MDBScrollbar style={{ position: "relative", height: "400px" }}> */}
                 <MDBCardBody>
-                  <MDBTable className="mb-0">
-                    <MDBTableHead>
-                      <tr>
-                        <th scope="col"><strong>Trips</strong></th>
-                        <th scope="col"><strong>Start Time</strong></th>
-                        <th scope="col"><strong>End Time</strong></th>
-                        <th scope="col"><strong>Budget</strong></th>
-                        <th scope="col"><strong>Actions</strong></th>
-                      </tr>
-                    </MDBTableHead>
-                    <MDBTableBody>
-                      <tr className="fw-normal">
-                        <th>
-                          <img
-                            src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp"
-                            alt="avatar"
-                            className="shadow-1-strong rounded-circle"
-                            style={{ width: "45px", height: "auto" }}
-                          />
-                          <span className="ms-2">Seattle</span>
-                        </th>
-                        <td className="">
-                          <span>5:00</span>
-                        </td>
-                        <td className="">
-                          <h6 className="mb-0">
-                          <span>6:00</span>
-                          </h6>
-                        </td>
-                        <td>100</td>
-                        <td className="">
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Edit"
-                          >
-                            <MDBIcon
-                              fas
-                              icon="pencil-alt"
-                              size="lg"
-                              className="me-3"
-                              style={{color:"#04b4bd"}}
-                            />
-                          </MDBTooltip>
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Remove"
-                          >
-                            <MDBIcon
-                              fas
-                              icon="trash-alt"
-                              color="danger"
-                              size="lg"
-                              className="me-3"
-                            />
-                          </MDBTooltip>
-                        </td>
-                      </tr>
-                      <tr className="fw-normal">
-                        <th>
-                          <img
-                            src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-4.webp"
-                            alt="avatar"
-                            className="shadow-1-strong rounded-circle"
-                            style={{ width: "45px", height: "auto" }}
-                          />
-                          <span className="ms-2">Arizona</span>
-                        </th>
-                        <td className="">
-                          <span>7:00</span>
-                        </td>
-                        <td className="">
-                          <h6 className="mb-0">
-                            <span>8:00</span>
-                          </h6>
-                        </td>
-                        <td>
-                            300
-                        </td>
-                        <td className="">
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Edit"
-                          >
-                            <MDBIcon
-                               fas
-                               icon="pencil-alt"
-                               size="lg"
-                               className="me-3"
-                               style={{color:"#04b4bd"}}
-                            />
-                          </MDBTooltip>
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Remove"
-                          >
-                            <MDBIcon
-                              fas
-                              icon="trash-alt"
-                              color="danger"
-                              size="lg"
-                              className="me-3"
-                            />
-                          </MDBTooltip>
-                        </td>
-                      </tr>
-                      <tr className="fw-normal">
-                        <th>
-                          <img
-                            src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp"
-                            alt="avatar"
-                            className="shadow-1-strong rounded-circle"
-                            style={{ width: "45px", height: "auto" }}
-                          />
-                          <span className="ms-2">New York</span>
-                        </th>
-                        <td className="">
-                          <span>3:00</span>
-                        </td>
-                        <td className="">
-                          <h6 className="mb-0">
-                            <span>4:00</span>
-                          </h6>
-                        </td>
-                        <td>200</td>
-                        <td className="">
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="DEdit"
-                          >
-                            <MDBIcon
-                               fas
-                               icon="pencil-alt"
-                               size="lg"
-                               className="me-3"
-                               style={{color:"#04b4bd"}}
-                            />
-                          </MDBTooltip>
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Remove"
-                          >
-                            <MDBIcon
-                              fas
-                              icon="trash-alt"
-                              color="danger"
-                              size="lg"
-                              className="me-3"
-                            />
-                          </MDBTooltip>
-                        </td>
-                      </tr>
-                      
-                     
-                      
-                    </MDBTableBody>
-                  </MDBTable>
+                  <MDBRow className="m-2">
+                    <MDBCol className="mx-3 px-4 px-1" style={{ border: '1.5px solid #808080', borderRadius: '50px' }}>
+                      <MDBRow className="d-flex align-items-center w-100 px-0">
+                        <MDBCol className="d-flex align-items-center" md='10'>
+                          <input type="text" placeholder="Search trip by name" className="search-input w-100" />
+                        </MDBCol>
+                        <MDBCol className="d-flex justify-content-end" md='2'>
+                          <button style={{ backgroundColor: 'white', border: "0px" }}>
+                            <MDBIcon fas icon="search fa-1.5x" style={{ color: '#808080' }} />
+                          </button>
+                        </MDBCol>
+                      </MDBRow>
+                    </MDBCol>
+                    <MDBCol className="mx-3 px-4 d-flex align-items-center w-100" style={{ border: '1.5px solid #808080', borderRadius: '50px' }}>
+                      <MDBRow className="d-flex align-items-center w-100 px-0">
+                        <MDBCol className="d-flex align-items-center" md='10'>
+                          <input type="text" placeholder="Search trip by creator" className="search-input w-100" />
+                        </MDBCol>
+                        <MDBCol className="d-flex justify-content-end" md='2'>
+                          <button style={{ backgroundColor: 'white', border: "0px" }}>
+                            <MDBIcon fas icon="search fa-1.5x" style={{ color: '#808080' }} />
+                          </button>
+
+                        </MDBCol>
+                      </MDBRow>
+                    </MDBCol>
+
+                  </MDBRow>
+                  <MDBRow className="m-4 rounded" >
+                  <MDBCard >
+                    <MDBCardHeader>
+                    <MDBTabs >
+                      <MDBCol>
+                      <MDBTabsItem>
+                        <MDBTabsLink className="text-center" style={{borderRadius: '10px 0px 0px 10px'}} onClick={() => handleBasicClick('Upcoming Trips')} active={basicActive === 'Upcoming Trips'}>
+                          Upcoming Trips
+                        </MDBTabsLink>
+                      </MDBTabsItem>
+                      </MDBCol>
+                      <MDBCol>
+                      <MDBTabsItem>
+                        <MDBTabsLink className='text-center' style={{borderRadius: '0px 10px 10px 0px'}} onClick={() => handleBasicClick('Previous Trips')} active={basicActive === 'Previous Trips'}>
+                          Previous Trips
+                        </MDBTabsLink>
+                      </MDBTabsItem>
+                      </MDBCol>
+                    </MDBTabs>
+                    </MDBCardHeader>
+                  <MDBCardBody>
+                    <MDBTabsContent>
+                      <MDBTabsPane open={basicActive === 'Upcoming Trips'}>
+                        <MDBRow>
+                          <MDBCol md='4'>
+                              <TripListItem />
+                          </MDBCol>
+                          <MDBCol md='4'>
+                              <TripListItem />
+                          </MDBCol>
+                          <MDBCol md='4'>
+                              <TripListItem />
+                          </MDBCol>
+                    
+                        </MDBRow>
+                      </MDBTabsPane>
+                      <MDBTabsPane open={basicActive === 'Previous Trips'}>Previous Trips content</MDBTabsPane>
+                    </MDBTabsContent>
+                    </MDBCardBody>
+                    </MDBCard>
+                  </MDBRow>
+
                 </MDBCardBody>
-              {/* </MDBScrollbar> */}
-            </MDBCard>
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
-    </section>
-      </MDBCol>
-    </MDBRow>
+                {/* </MDBScrollbar> */}
+              </MDBCard>
+        </MDBContainer>
   );
 };
 
