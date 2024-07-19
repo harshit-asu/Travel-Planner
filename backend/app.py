@@ -352,7 +352,7 @@ def update_trip(trip_id):
         abort(400)
 
     try:
-        trip = Trip.query.filter_by(trip_id=trip_id)
+        trip = Trip.query.filter_by(trip_id=trip_id).first()
         if not trip:
             abort(404)
 
@@ -376,7 +376,7 @@ def update_trip(trip_id):
 @token_required
 def delete_trip(trip_id):
     try:
-        trip = Trip.query.get(trip_id)
+        trip = Trip.query.filter_by(trip_id=trip_id).first()
         if not trip or trip.created_by != g.current_user_id:
             abort(404)
 
@@ -425,7 +425,7 @@ def invite_to_trip(trip_id):
 
     try:
         # Check if invitee exists and is not already a member
-        invitee = User.query.filter_by(user_id=data['invitee_id'])
+        invitee = User.query.filter_by(user_id=data['invitee_id']).first()
         if not invitee:
             abort(404)
 
@@ -464,7 +464,7 @@ def invite_to_trip(trip_id):
 @token_required
 def accept_invitation(invitation_id):
     try:
-        invitation = TripInvitation.query.filter_by(invitation_id=invitation_id)
+        invitation = TripInvitation.query.filter_by(invitation_id=invitation_id).first()
         if not invitation or invitation.receiver_id != g.current_user_id:
             abort(404)
 
@@ -482,6 +482,35 @@ def accept_invitation(invitation_id):
 
         # Delete invitation
         db.session.delete(invitation)
+
+        db.session.commit()
+        return jsonify({'message': 'Invitation accepted successfully'}), 200
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/invitations/<int:invitation_id>/decline', methods=['DELETE'])
+@token_required
+def decline_invitation(invitation_id):
+    try:
+        invitation = TripInvitation.query.filter_by(invitation_id=invitation_id).first()
+        if not invitation or invitation.receiver_id != g.current_user_id:
+            abort(404)
+        
+        # create a new notification
+        receiver = invitation.receiver
+
+        new_notification = Notification(
+            user_id=invitation.sender_id,
+            message=f"The user {receiver.first_name} {receiver.last_name} decline your invitation to join the trip {invitation.trip.trip_name} :("
+        )
+
+        # Delete invitation
+        db.session.delete(invitation)
+
+        db.session.add(new_notification)
 
         db.session.commit()
         return jsonify({'message': 'Invitation accepted successfully'}), 200
@@ -556,7 +585,68 @@ def get_expenses(trip_id):
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
 
+@app.route('/expenses/<int:expense_id>', method=['PUT'])
+@token_required
+def update_expense(expense_id):
+    data = request.get_json()
+    if not data or 'split_with' not in data:
+        abort(400)
+
+    try:
+        expense = Expense.query.filter_by(expense_id=expense_id).first()
+        if not expense or not is_trip_member(expense.trip_id, g.current_user_id):
+            abort(404)
+        
+        expense.paid_by = data.get('paid_by', expense.paid_by)
+        expense.category = data.get('category', expense.category)
+        expense.amount = data.get('amount', expense.amount)        
+        expense.expense_date = data.get('expense_date', expense.expense_date)        
+        expense.description = data.get('description', expense.description)     
+
+        if 'split_with' in data:
+            splits = ExpenseSplit.query.filter_by(expense_id=expense_id).all()
+            for split in splits:
+                db.session.delete(split)
+
+            for split_user_id, amount in data['split_with'].items():
+                split_member = TripMember.query.filter_by(trip_id=expense.trip_id, user_id=int(split_user_id)).first()
+                if split_member:
+                    new_split = ExpenseSplit(
+                        expense_id=expense_id,
+                        trip_member_id=split_member.trip_member_id,
+                        amount=amount
+                    )
+                    split_member.total_expenses += amount
+                    db.session.add(new_split)  
+            
+        db.session.commit()
+
+        return jsonify({"message": "Expense updated successfully"}), 201
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/expenses/<int:expense_id>', method=['DELETE'])
+@token_required
+def delet_expense(expense_id):
+    try:
+        expense = Expense.query.filter_by(expense_id=expense_id).first()
+        if not expense or not is_trip_member(expense.trip_id, g.current_user_id):
+            abort(404)
+
+        db.session.delete(expense)    
+        db.session.commit()
+
+        return jsonify({"message": "Expense deleted successfully"}), 201
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 
 # Expense splitting endpoints
 
@@ -694,19 +784,20 @@ def delete_destination(destination_id):
 
 # Activity management endpoints
 
-@app.route('/destinations/<int:destination_id>/activities', methods=['POST'])
+@app.route('/trips/<int:trip_id>/activities', methods=['POST'])
 @token_required
-def add_activity(destination_id):
+def add_activity(trip_id):
     data = request.get_json()
     if not data or 'activity_name' not in data:
         abort(400)
 
     try:
-        if not is_trip_member(Destination.query.filter_by(destination_id=destination_id).first().trip_id, g.current_user_id):
+        if not is_trip_member(trip_id, g.current_user_id):
             return jsonify({'error': 'User is not a member of this trip'}), 401
         
         new_activity = Activity(
-            destination_id=destination_id,
+            trip_id=trip_id,
+            destination_id=data.get('destination_id'),
             activity_name=data['activity_name'],
             start_time=datetime.strptime(data['start_time'], '%Y-%m-%dT%H:%M:%S') if data.get('start_time') else None,
             end_time=datetime.strptime(data['end_time'], '%Y-%m-%dT%H:%M:%S') if data.get('end_time') else None,
@@ -722,20 +813,22 @@ def add_activity(destination_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/destinations/<int:destination_id>/activities', methods=['GET'])
+@app.route('/trips/<int:trip_id>/activities', methods=['GET'])
 @token_required
-def get_activities(destination_id):
+def get_activities(trip_id):
     try:
-        if not is_trip_member(Destination.query.filter_by(destination_id=destination_id).first().trip_id, g.current_user_id):
+        if not is_trip_member(trip_id, g.current_user_id):
             return jsonify({'error': 'User is not a member of this trip'}), 401
         
-        activities = Activity.query.filter_by(destination_id=destination_id).all()
+        activities = Activity.query.filter_by(trip_id=trip_id).all()
 
         return jsonify({'activities': [{
             "activity_id": activity.activity_id,
             "activity_name": activity.activity_name,
+            "destination_id": activity.destination_id,
             "start_time": activity.start_time,
             "end_time": activity.end_time,
+            "description": activity.description
         } for activity in activities]}), 200
     
     except SQLAlchemyError as e:
@@ -756,6 +849,7 @@ def update_activity(activity_id):
             abort(404)
 
         activity.activity_name = data.get('activity_name', activity.activity_name)
+        activity.destination_id = data.get('destination_id', activity.destination_id)
         activity.start_time = datetime.strptime(data.get('start_time'), '%Y-%m-%dT%H:%M:%S') if data.get('start_time') else activity.start_time
         activity.end_time = datetime.strptime(data.get('end_time'), '%Y-%m-%dT%H:%M:%S') if data.get('end_time') else activity.end_time
         activity.description = data.get('description', activity.description)
@@ -788,7 +882,7 @@ def delete_activity(activity_id):
 
 # Transport management endpoints
 
-@app.route('/trips/<int:trip_id>/transport', methods=['POST'])
+@app.route('/trips/<int:trip_id>/transports', methods=['POST'])
 @token_required
 def add_transport(trip_id):
     data = request.get_json()
@@ -818,14 +912,14 @@ def add_transport(trip_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/trips/<int:trip_id>/transport', methods=['GET'])
+@app.route('/trips/<int:trip_id>/transports', methods=['GET'])
 @token_required
-def get_transport(trip_id):
+def get_transports(trip_id):
     try:
         if not is_trip_member(trip_id, g.current_user_id):
             return jsonify({'error': 'User is not a member of this trip'}), 401
         
-        transport = Transport.query.filter_by(trip_id=trip_id).all()
+        transports = Transport.query.filter_by(trip_id=trip_id).all()
 
         return jsonify({'transport': [{
             "transport_id": t.transport_id,
@@ -836,14 +930,14 @@ def get_transport(trip_id):
             "arrival_time": t.arrival_time,
             "cost": t.cost,
             "description": t.description
-        } for t in transport]}), 200
+        } for t in transports]}), 200
     
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/transport/<int:transport_id>', methods=['PUT'])
+@app.route('/transports/<int:transport_id>', methods=['PUT'])
 @token_required
 def update_transport(transport_id):
     data = request.get_json()
@@ -872,7 +966,7 @@ def update_transport(transport_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/transport/<int:transport_id>', methods=['DELETE'])
+@app.route('/transports/<int:transport_id>', methods=['DELETE'])
 @token_required
 def delete_transport(transport_id):
     try:
@@ -994,7 +1088,7 @@ def delete_accommodation(accommodation_id):
 
 # Packing list management endpoints
 
-@app.route('/trips/<int:trip_id>/packing_lists', methods=['POST'])
+@app.route('/trips/<int:trip_id>/packing-lists', methods=['POST'])
 @token_required
 def create_packing_list(trip_id):
     data = request.get_json()
@@ -1021,7 +1115,7 @@ def create_packing_list(trip_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/trips/<int:trip_id>/packing_lists', methods=['GET'])
+@app.route('/trips/<int:trip_id>/packing-lists', methods=['GET'])
 @token_required
 def get_packing_lists(trip_id):
     try:
@@ -1042,7 +1136,7 @@ def get_packing_lists(trip_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/packing_lists/<int:packing_list_id>', methods=['PUT'])
+@app.route('/packing-lists/<int:packing_list_id>', methods=['PUT'])
 @token_required
 def update_packing_list(packing_list_id):
     data = request.get_json()
@@ -1067,7 +1161,7 @@ def update_packing_list(packing_list_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/packing_lists/<int:packing_list_id>', methods=['DELETE'])
+@app.route('/packing-lists/<int:packing_list_id>', methods=['DELETE'])
 @token_required
 def delete_packing_list(packing_list_id):
     try:

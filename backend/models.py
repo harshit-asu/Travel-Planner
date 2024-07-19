@@ -55,6 +55,8 @@ class Trip(db.Model):
     transports = db.relationship('Transport', cascade="all,delete", backref='trip', lazy=True)
     accommodations = db.relationship('Accommodation', cascade="all,delete", backref='trip', lazy=True)
     packing_list = db.relationship('PackingList', cascade="all,delete", backref='trip', lazy=True)
+    activities = db.relationship('Activity', cascade="all,delete", backref='trip', lazy=True)
+    destinations = db.relationship('Destination', cascade="all,delete", backref='trip', lazy=True)
 
 
 class TripMember(db.Model):
@@ -107,7 +109,8 @@ class Destination(db.Model):
     __tablename__ = 'destinations'
 
     destination_id = db.Column(db.Integer, primary_key=True)
-    place_id = db.Column(db.Integer, db.ForeignKey('places.place_id'))
+    trip_id = db.Column(db.Integer, db.ForeignKey('trips.trip_id'))
+    place_id = db.Column(db.Integer, db.ForeignKey('places.place_id'), nullable=True)
     arrival = db.Column(db.DateTime(timezone=True))
     departure = db.Column(db.DateTime(timezone=True))
     description = db.Column(db.Text)
@@ -151,7 +154,8 @@ class Activity(db.Model):
     __tablename__ = 'activities'
 
     activity_id = db.Column(db.Integer, primary_key=True)
-    destination_id = db.Column(db.Integer, db.ForeignKey('destinations.destination_id'))
+    trip_id = db.Column(db.Integer, db.ForeignKey('trips.trip_id'))
+    destination_id = db.Column(db.Integer, db.ForeignKey('destinations.destination_id'), nullable=True)
     activity_name = db.Column(db.String(255), nullable=False)
     start_time = db.Column(db.DateTime(timezone=True))
     end_time = db.Column(db.DateTime(timezone=True))
