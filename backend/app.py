@@ -587,7 +587,7 @@ def get_expenses(trip_id):
         return jsonify({'error': str(e)}), 500
     
 
-@app.route('/expenses/<int:expense_id>', method=['PUT'])
+@app.route('/expenses/<int:expense_id>', methods=['PUT'])
 @token_required
 def update_expense(expense_id):
     data = request.get_json()
@@ -630,7 +630,7 @@ def update_expense(expense_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/expenses/<int:expense_id>', method=['DELETE'])
+@app.route('/expenses/<int:expense_id>', methods=['DELETE'])
 @token_required
 def delet_expense(expense_id):
     try:

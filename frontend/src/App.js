@@ -10,6 +10,7 @@ import Header from './components/Header';
 import Trip from './components/trips/Trip';
 import Filter from './components/trips/Filter';
 import Navbar from './components/Navbar';
+import Home from './components/Home';
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword/>} />
             <Route path="/verify-code" element={<VerifyCode/>} />
             <Route path="/reset-password" element={<ResetPassword/>} />
-            <Route path="/" element={<TripList/>} />
+            <Route path="/" element={<Home/>} />
           </Routes>
         </div>
       </Router>
