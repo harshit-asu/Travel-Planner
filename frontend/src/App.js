@@ -7,7 +7,7 @@ import VerifyCode from './components/login/VerifyCode';
 import ResetPassword from './components/login/ResetPassword';
 import TripList from './components/trips/TripList';
 import Header from './components/Header';
-import Trip from './components/trips/Trip';
+import Trip from './components/Trip/Trip';
 import Filter from './components/trips/Filter';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
@@ -24,7 +24,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword/>} />
             <Route path="/verify-code" element={<VerifyCode/>} />
             <Route path="/reset-password" element={<ResetPassword/>} />
-            <Route path="/" element={<Home/>} />
+            <Route path="/" element={<Trip/>} />
           </Routes>
         </div>
       </Router>
