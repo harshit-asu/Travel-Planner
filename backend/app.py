@@ -139,7 +139,7 @@ def forgot_password():
     
     return jsonify({
         "message": "User exists",
-        "user_id": user.id
+        "user_id": user.user_id
     }), 200
 
 
@@ -207,6 +207,7 @@ def get_user(user_id):
             "username": user.username,
             "first_name": user.first_name,
             "last_name": user.last_name,
+            "phone_number": user.phone_number,
             "created_at": user.created_at,
             "is_verified": user.is_verified,
             "role": user.role,
@@ -238,8 +239,8 @@ def delete_user(user_id):
 @app.route('/users/<int:user_id>', methods=['PUT'])
 @token_required
 def update_user(user_id):
-    current_user = User.query.filter_by(user_id=g.current_user_id, role='admin').first()
-    if current_user is None and g.current_user_id != user_id:
+    admin_user = User.query.filter_by(user_id=g.current_user_id, role='admin').first()
+    if admin_user is None and g.current_user_id != user_id:
         abort(400)
     try:
         data = request.get_json()
@@ -254,12 +255,12 @@ def update_user(user_id):
         if password:
             user.set_password(password)
         user.profile_picture = data.get('profile_picture')
-        if current_user.role == 'admin':
+        if admin_user:
             user.role = data.get('role')
         
         db.session.commit()
 
-        return jsonify({"message": "User deleted successfully"}), 200
+        return jsonify({"message": "User updated successfully"}), 200
     
     except SQLAlchemyError as error:
         db.session.rollback()
@@ -448,7 +449,7 @@ def invite_to_trip(trip_id):
         # create a new notification
         new_notification = Notification(
             user_id=data['invitee_id'],
-            message=f"You have a new trip invitation from {g.current_user_id}"
+            message=f"You have a new trip invitation."
         )
         db.session.add(new_notification)
         db.session.commit()
@@ -460,11 +461,11 @@ def invite_to_trip(trip_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/invitations/<int:invitation_id>/accept', methods=['PUT'])
+@app.route('/invitations/<int:trip_invitation_id>/accept', methods=['PUT'])
 @token_required
-def accept_invitation(invitation_id):
+def accept_invitation(trip_invitation_id):
     try:
-        invitation = TripInvitation.query.filter_by(invitation_id=invitation_id).first()
+        invitation = TripInvitation.query.filter_by(trip_invitation_id=trip_invitation_id).first()
         if not invitation or invitation.receiver_id != g.current_user_id:
             abort(404)
 
@@ -491,20 +492,20 @@ def accept_invitation(invitation_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/invitations/<int:invitation_id>/decline', methods=['DELETE'])
+@app.route('/invitations/<int:trip_invitation_id>/decline', methods=['DELETE'])
 @token_required
-def decline_invitation(invitation_id):
+def decline_invitation(trip_invitation_id):
     try:
-        invitation = TripInvitation.query.filter_by(invitation_id=invitation_id).first()
+        invitation = TripInvitation.query.filter_by(trip_invitation_id=trip_invitation_id).first()
         if not invitation or invitation.receiver_id != g.current_user_id:
             abort(404)
         
         # create a new notification
-        receiver = invitation.receiver
+        recipient = invitation.recipient
 
         new_notification = Notification(
             user_id=invitation.sender_id,
-            message=f"The user {receiver.first_name} {receiver.last_name} decline your invitation to join the trip {invitation.trip.trip_name} :("
+            message=f"The user {recipient.first_name} {recipient.last_name} declined your invitation to join the trip {invitation.trip.trip_name} :("
         )
 
         # Delete invitation
@@ -513,7 +514,7 @@ def decline_invitation(invitation_id):
         db.session.add(new_notification)
 
         db.session.commit()
-        return jsonify({'message': 'Invitation accepted successfully'}), 200
+        return jsonify({'message': 'Invitation declined successfully'}), 200
     
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -1174,6 +1175,28 @@ def delete_packing_list(packing_list_id):
 
         return jsonify({'message': 'Packing list deleted successfully'}), 200
     
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/users/<int:user_id>/notifications', methods=['GET'])
+@token_required
+def get_user_notifications(user_id):
+    try:
+        user = User.query.filter_by(user_id=user_id).first()
+        if not user or g.current_user_id != user_id:
+            abort(404)
+        
+        return jsonify({
+            "notifications": [{
+                "user_id": n.user_id,
+                "notification_id": n.notification_id,
+                "message": n.message,
+                "is_read": n.is_read
+            } for n in user.notifications]
+        }), 200
+
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500

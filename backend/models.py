@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 
 db = SQLAlchemy()
 
@@ -82,7 +82,7 @@ class TripInvitation(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     sender_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     invitation_sent_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
-    expiry_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now() + db.func.interval('1 week'))
+    expiry_at = db.Column(db.DateTime(timezone=True), default=datetime.now().astimezone() + timedelta(days=7))
 
 
 class Place(db.Model):
