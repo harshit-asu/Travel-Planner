@@ -111,6 +111,7 @@ class Destination(db.Model):
     destination_id = db.Column(db.Integer, primary_key=True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trips.trip_id'))
     place_id = db.Column(db.Integer, db.ForeignKey('places.place_id'), nullable=True)
+    destination_name = db.Column(db.String(255), nullable=False)
     arrival = db.Column(db.DateTime(timezone=True))
     departure = db.Column(db.DateTime(timezone=True))
     description = db.Column(db.Text)

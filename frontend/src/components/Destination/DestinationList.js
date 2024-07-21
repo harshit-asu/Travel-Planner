@@ -29,8 +29,8 @@ const DestinationList = props => {
                 <strong>Destinations</strong>
               </h4>
             </MDBCol>
-            <MDBCol md={4} className="d-flex justify-content-end pe-5">
-              <MDBBtn className="mb-0 px-5 btn-custom " size="md" onClick={() => setOpenAddTripModal(true)}>Add Destination</MDBBtn>
+            <MDBCol md={4} className="d-flex justify-content-end pe-4">
+              <MDBBtn className="mb-0 me-2 px-5 btn-custom " size="md" onClick={() => setOpenAddTripModal(true)}>Add Destination</MDBBtn>
               <AddDestination open={openAddTripModal} close={closeAddTripModal}/>
             </MDBCol>
           </MDBRow>
