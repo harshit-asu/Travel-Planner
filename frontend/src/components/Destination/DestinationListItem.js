@@ -46,7 +46,7 @@ const DestinationListItem = props => {
                   
 
                   <MDBDropdown>
-                    <MDBDropdownToggle color='transparent' style={{boxShadow: 'none', color: '#04b4bd',fontSize:'14px'}}><i class="fas fa-ellipsis-v fa-xl"></i></MDBDropdownToggle>
+                    <MDBDropdownToggle color='transparent' style={{boxShadow: 'none', color: '#04b4bd',fontSize:'14px'}}><i className="fas fa-ellipsis-v fa-xl"></i></MDBDropdownToggle>
                     <MDBDropdownMenu>
                       <MDBDropdownItem link>Edit</MDBDropdownItem>
                       <MDBDropdownItem link>Delete</MDBDropdownItem>

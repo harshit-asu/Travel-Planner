@@ -13,7 +13,7 @@ import {
 import { getUserDataForNavbar, logout } from '../../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 
-const NavbarProfile = props => {
+const NavbarProfile = ({currentUserId}) => {
     const [userName, setUserName] = useState('');
     const [notifications, setNotifications] = useState([]);
     let navigate = useNavigate();
@@ -36,15 +36,15 @@ const NavbarProfile = props => {
 
     return (
         <MDBRow className='w-100 mx-0'>
-            <MDBCol md='7' className=' d-flex flex-row justify-content-end align-items-center '>
+            <MDBCol className=' d-flex flex-row justify-content-end align-items-center '>
             <MDBNavbarItem>
                 <MDBNavbarLink href='#'>
-                <MDBIcon fas icon="bell fa-1x  ms-8" style={{ color: 'white' }} />
+                <MDBIcon fas icon="bell fa-1x" style={{ color: 'white' }} />
                 <span className="badge rounded-pill badge-notification bg-danger">{(notifications.length !== 0) && notifications.length}</span>
                 </MDBNavbarLink>
             </MDBNavbarItem>
             </MDBCol>
-            <MDBCol md='5' className='d-flex flex-row justify-content-end'>
+            <MDBCol className='d-flex flex-grow-0 flex-row justify-content-end'>
             <MDBNavbarItem>
                 <MDBDropdown>
                     <MDBDropdownToggle className='dropdown-custom'>
@@ -52,7 +52,7 @@ const NavbarProfile = props => {
                         <MDBIcon fas icon="chevron-circle-down  ms-8 " style={{ color: 'white' }} />
                     </MDBDropdownToggle>
                     <MDBDropdownMenu>
-                        <Link to={'/profile'}><MDBDropdownItem link>My Profile</MDBDropdownItem></Link>
+                        <Link to={'/profile'} state={{ "currentUserId": currentUserId }}><MDBDropdownItem link>My Profile</MDBDropdownItem></Link>
                         <Link to={'/trips'}><MDBDropdownItem link>My Trips</MDBDropdownItem></Link>
                         <Link onClick={handleLogout}><MDBDropdownItem link>Logout</MDBDropdownItem></Link>
                     </MDBDropdownMenu>

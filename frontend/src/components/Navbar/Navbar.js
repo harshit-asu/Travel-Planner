@@ -33,7 +33,7 @@ const Navbar = ({currentUserId}) => {
             {(currentUserId === null) ? <NavbarOptions /> : <NavbarSearch />}
           </MDBCol>
           <MDBCol md='3' className='d-flex flex-row justify-content-end align-items-center'>
-            {(currentUserId === null) ? <NavbarAuth /> : <NavbarProfile /> }
+            {(currentUserId === null) ? <NavbarAuth /> : <NavbarProfile currentUserId={currentUserId} /> }
           </MDBCol>
         </MDBRow>
       </MDBContainer>

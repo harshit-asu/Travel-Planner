@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
   MDBContainer,
@@ -17,10 +17,14 @@ import {
   MDBTabsPane, 
 } from 'mdb-react-ui-kit';
 import DestinationList from '../Destination/DestinationList';
+import { useParams } from 'react-router-dom';
+import Loading from '../Misc/Loading';
+import { getTrip } from '../../services/api';
 
 
 const Trip = props => {
   const [verticalActive, setVerticalActive] = useState('Destinations');
+  const [trip, setTrip] = useState(null);
 
   const handleVerticalClick = (value) => {
     if (value === verticalActive) {
@@ -29,6 +33,26 @@ const Trip = props => {
 
     setVerticalActive(value);
   };
+
+  const {trip_id} = useParams();
+
+  const fetchTripData = async () => {
+    const { data } = await getTrip(trip_id);
+    setTrip(data.trips[0]);
+    setIsDataLoading(false);
+  }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchTripData();
+  }, []);
+
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
+  if(isDataLoading){
+    return <Loading />
+  }
+
   return (
     <MDBContainer fluid className="vh-100 mt-3">
     <MDBCard >
@@ -37,13 +61,13 @@ const Trip = props => {
           <MDBCol md={4} className="d-flex flex-column justify-content-center">
             <h3 className="mb-0 ms-4 ps-2" style={{ color: '#04b4bd' }}>
               {/* <MDBIcon fas icon="chevron-right" className="me-2" /> */}
-              <strong>Trip Name</strong>
+              <strong>{trip.trip_name}</strong>
             </h3>
-            <p className="mb-0 ms-4 ps-2" style={{fontSize:"12px", color:"#803300"}}> Created by Swathi</p>
+            <p className="mb-0 ms-4 ps-3" style={{fontSize:"12px", color:"#803300"}}>Created by {trip.created_by}</p>
           </MDBCol>
           <MDBCol md={4} className="d-flex justify-content-center pe-5">
             
-            <h5 className="mb-0 ms-4 ps-2 mt-3" style={{ color: 'grey' }}> <strong>7/19/2024  -  7/19/2024 </strong></h5>
+            <h5 className="mb-0 ms-4 ps-2 mt-3" style={{ color: 'grey' }}> <strong>{trip.start_date} - {trip.end_date}</strong></h5>
           
           </MDBCol>
           <MDBCol md={4} className="d-flex justify-content-end pe-5 py-3">

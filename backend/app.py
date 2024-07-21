@@ -226,11 +226,10 @@ def get_user(user_id):
         user = User.query.filter_by(user_id=user_id).first()
         if not user:
             abort(404)
-        print(datetime.now().astimezone().isoformat())
-        print(user.created_at)
         return jsonify({"users": [{
             "user_id": user.user_id,
             "username": user.username,
+            "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "phone_number": user.phone_number,
@@ -290,7 +289,7 @@ def update_user(user_id):
     
     except SQLAlchemyError as error:
         db.session.rollback()
-        return jsonify({"message": "Something went wrong during user deletion", 'error': str(error)}), 500
+        return jsonify({"message": "Something went wrong during user updation", 'error': str(error)}), 500
     
 
 @app.route('/navbar', methods=['GET'])
@@ -353,9 +352,10 @@ def get_trip(trip_id):
         return jsonify({"trips": [{
             "trip_id": trip.trip_id,
             "trip_name": trip.trip_name,
-            "start_date": trip.start_date,
-            "end_date": trip.end_date,
+            "start_date": trip.start_date.strftime('%d %b %Y'),
+            "end_date": trip.end_date.strftime('%d %b %Y'),
             "budget": trip.budget,
+            "created_by": get_user_name(trip.created_by),
             "created_at": trip.created_at
         }]}), 200
     
@@ -451,7 +451,6 @@ def get_trip_members(trip_id):
             return jsonify({'error': 'User is not a member of this trip'}), 401
 
         stmt = select(User, TripMember).join(TripMember, User.user_id == TripMember.user_id).where(TripMember.trip_id == trip_id)
-        print(stmt)
 
         result = db.session.execute(stmt).all()
 

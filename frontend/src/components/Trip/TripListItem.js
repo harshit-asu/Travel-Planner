@@ -19,10 +19,9 @@ const TripListItem = ({ trip }) => {
   let navigate = useNavigate();
 
   const navigateToTripDetailsPage = () => {
-    navigate(`/trips/${trip.trip_id}`, {
-      "trip": trip
-    });
-    window.location.reload();
+    navigate(`/trips/${trip.trip_id}`, {state: {
+      trip: trip
+    }});
   };
 
   return (

@@ -17,6 +17,7 @@ import {
 import MyTripsItem from "./TripListItem";
 import AddTrip from "./AddTrip";
 import { getTrips } from "../../services/api";
+import NoTrips from "./NoTrips";
 
 
 const MyTrips = () => {
@@ -55,7 +56,6 @@ const MyTrips = () => {
       }
       setPreviousTrips(past);
       setUpcomingTrips(future);
-      console.log(future);
     } catch (error) {
       console.log(error);
     }
@@ -173,11 +173,15 @@ const MyTrips = () => {
               </MDBCardHeader>
               <MDBCardBody>
                 <MDBTabsContent>
-                  <MDBTabsPane open={basicActive === "Upcoming Trips"} className="d-flex flex-row flex-wrap">
-                    {upcomingTrips.map((trip) => <MDBCol md={4}><MyTripsItem trip={trip}/></MDBCol>)}
+                  <MDBTabsPane open={basicActive === "Upcoming Trips"}>
+                    <div className="d-flex flex-wrap">
+                      {(upcomingTrips.length !== 0) ? upcomingTrips.map((trip) => <MDBCol md={4}><MyTripsItem key={trip.trip_id} trip={trip} /></MDBCol>) : <NoTrips />}
+                    </div> 
                   </MDBTabsPane>
                   <MDBTabsPane open={basicActive === "Previous Trips"}>
-                    Previous Trips content
+                    <div className="d-flex flex-wrap">
+                      {(previousTrips.length !== 0) ? previousTrips.map((trip) => <MDBCol md={4}><MyTripsItem key={trip.trip_id} trip={trip} /></MDBCol>) : <NoTrips previous={true} />}
+                    </div> 
                   </MDBTabsPane>
                 </MDBTabsContent>
               </MDBCardBody>
