@@ -34,3 +34,34 @@ body {
     background: transparent !important;
     box-shadow: none !important;
 }
+
+.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    overflow: auto;
+    background: lime; /* Just to visualize the extent */
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #04b4bd50;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #04b4bd !important;
+}

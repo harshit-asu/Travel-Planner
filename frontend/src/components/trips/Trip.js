@@ -15,7 +15,7 @@ import {
   MDBTooltip,
   MDBBtn,
 } from "mdb-react-ui-kit";
-import Filter from "./Filter";
+import Filter from "../Trip/Filter";
 
 const Trip = () => {
   return (
