@@ -12,7 +12,6 @@ import {
   MDBRow,
   MDBCol,
 } from 'mdb-react-ui-kit';
-import PropTypes from 'prop-types'
 import { createTrip } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -67,6 +66,7 @@ const AddTrip = ({ open, close }) => {
             <MDBModalTitle style={{color: 'white'}}>New Trip</MDBModalTitle>
             <MDBBtn className='btn-close' color='none' onClick={close}></MDBBtn>
           </MDBModalHeader>
+          <form onSubmit={handleAddTrip}>
           <MDBModalBody>
 
             <div className="form-outline">
@@ -98,8 +98,9 @@ const AddTrip = ({ open, close }) => {
 
           </MDBModalBody>
           <MDBModalFooter className='d-flex justify-content-center'>
-            <MDBBtn className='btn-custom' onClick={handleAddTrip} >Save</MDBBtn>
+            <MDBBtn className='btn-custom' type='submit' >Save</MDBBtn>
           </MDBModalFooter>
+          </form>
         </MDBModalContent>
       </MDBModalDialog>
     </MDBModal>

@@ -175,12 +175,12 @@ const MyTrips = () => {
                 <MDBTabsContent>
                   <MDBTabsPane open={basicActive === "Upcoming Trips"}>
                     <div className="d-flex flex-wrap">
-                      {(upcomingTrips.length !== 0) ? upcomingTrips.map((trip) => <MDBCol md={4}><MyTripsItem key={trip.trip_id} trip={trip} /></MDBCol>) : <NoTrips />}
+                      {(upcomingTrips.length !== 0) ? upcomingTrips.map((trip) => <MDBCol md={4} key={trip.trip_id}><MyTripsItem  trip={trip} /></MDBCol>) : <NoTrips />}
                     </div> 
                   </MDBTabsPane>
                   <MDBTabsPane open={basicActive === "Previous Trips"}>
                     <div className="d-flex flex-wrap">
-                      {(previousTrips.length !== 0) ? previousTrips.map((trip) => <MDBCol md={4}><MyTripsItem key={trip.trip_id} trip={trip} /></MDBCol>) : <NoTrips previous={true} />}
+                      {(previousTrips.length !== 0) ? previousTrips.map((trip) => <MDBCol md={4} key={trip.trip_id}><MyTripsItem trip={trip} /></MDBCol>) : <NoTrips previous={true} />}
                     </div> 
                   </MDBTabsPane>
                 </MDBTabsContent>

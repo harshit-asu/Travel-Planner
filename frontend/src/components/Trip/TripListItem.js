@@ -32,7 +32,7 @@ const TripListItem = ({ trip }) => {
         </div>
         <MDBCardBody>
           <MDBCardTitle className='mb-3'><b>{trip.trip_name}</b></MDBCardTitle>
-          <MDBCardText className='mt-2'>
+          {/* <MDBCardText className='mt-2'> */}
             <MDBRow>
               <MDBCol md={1}>
                 <MDBIcon fas icon="users fa-1x me-2" style={{ color: '#04b4bd' }} />
@@ -49,7 +49,7 @@ const TripListItem = ({ trip }) => {
                  <p>{trip.start_date} - {trip.end_date}</p>
               </MDBCol>
             </MDBRow>
-          </MDBCardText>
+          {/* </MDBCardText> */}
           <div className='d-flex justify-content-center'>
             <MDBBtn className="mb-0 px-3 btn-custom " size="md" onClick={navigateToTripDetailsPage}>View details</MDBBtn>
           </div>

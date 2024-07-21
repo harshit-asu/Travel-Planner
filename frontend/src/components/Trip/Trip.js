@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
   MDBContainer,
@@ -17,14 +17,21 @@ import {
   MDBTabsPane, 
 } from 'mdb-react-ui-kit';
 import DestinationList from '../Destination/DestinationList';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Loading from '../Misc/Loading';
-import { getTrip } from '../../services/api';
+import { deleteTrip, getTrip } from '../../services/api';
+import EditTrip from './EditTrip';
 
 
 const Trip = props => {
   const [verticalActive, setVerticalActive] = useState('Destinations');
   const [trip, setTrip] = useState(null);
+
+  const [openEditTripModal, setOpenEditTripModal] = useState(false);
+
+  const closeEditTripModal = () => {
+    setOpenEditTripModal(false);
+  }
 
   const handleVerticalClick = (value) => {
     if (value === verticalActive) {
@@ -35,19 +42,32 @@ const Trip = props => {
   };
 
   const {trip_id} = useParams();
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
-  const fetchTripData = async () => {
+  const fetchTripData = useCallback(async () => {
     const { data } = await getTrip(trip_id);
     setTrip(data.trips[0]);
     setIsDataLoading(false);
-  }
+  }, [trip_id]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setIsDataLoading(true);
     fetchTripData();
-  }, []);
+  }, [fetchTripData]);
 
-  const [isDataLoading, setIsDataLoading] = useState(true);
+  let navigate = useNavigate();
+
+  const handleTripDeletion = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await deleteTrip(trip_id);
+      navigate('/trips');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 
   if(isDataLoading){
     return <Loading />
@@ -73,7 +93,7 @@ const Trip = props => {
           <MDBCol md={4} className="d-flex justify-content-end pe-5 py-3">
                             <MDBTooltip
                             tag="a"
-                            wrapperProps={{ href: "#!" }}
+                            wrapperProps={{ onClick: () => setOpenEditTripModal(true) }}
                             title="Edit"
                           >
                             <MDBIcon
@@ -81,13 +101,14 @@ const Trip = props => {
                                icon="pencil-alt"
                                size="lg"
                                className="me-3"
-                               style={{color:"#04b4bd"}}
+                               style={{color:"#04b4bd", cursor: 'pointer'}}
                             />
                           </MDBTooltip>
+                          <EditTrip open={openEditTripModal} close={closeEditTripModal} trip={trip} fetchTripData={fetchTripData} />
                           <MDBTooltip
                             tag="a"
-                            wrapperProps={{ href: "#!" }}
-                            title="Remove"
+                            wrapperProps={{ onClick: handleTripDeletion }}
+                            title="Delete"
                           >
                             <MDBIcon
                               fas
@@ -95,6 +116,7 @@ const Trip = props => {
                               color="danger"
                               size="lg"
                               className="me-3"
+                              style={{ cursor: 'pointer' }}
                             />
                             </MDBTooltip>
 
@@ -148,7 +170,7 @@ const Trip = props => {
         </MDBCol>
         <MDBCol size='10'>
           <MDBTabsContent>
-            <MDBTabsPane open={verticalActive === 'Destinations'}><DestinationList/></MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Destinations'}><DestinationList trip_id={trip.trip_id} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Activities'}>Activities content</MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Transport'}>Transport content</MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Accomodation'}>Accomodation content</MDBTabsPane>

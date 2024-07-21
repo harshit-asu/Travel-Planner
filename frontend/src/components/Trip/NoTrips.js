@@ -9,7 +9,7 @@ import {
 import no_trips from '../../assets/no_trips.jpg'
 import AddTrip from './AddTrip';
 
-const NoTrips = ({ previous, open }) => {
+const NoTrips = ({ previous }) => {
   const [openAddTripModal, setOpenAddTripModal] = useState(false);
   return (
     <MDBContainer className="my-5">
