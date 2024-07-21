@@ -12,6 +12,8 @@ import Filter from './components/trips/Filter';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import ViewProfile from './components/Profile/ViewProfile';
+import Dashboard from './components/Dashboard';
+
 
 function App() {
   return (
@@ -25,7 +27,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword/>} />
             <Route path="/verify-code" element={<VerifyCode/>} />
             <Route path="/reset-password" element={<ResetPassword/>} />
-            <Route path="/" element={<ViewProfile/>} />
+            <Route path="/" element={<Dashboard/>} />
           </Routes>
         </div>
       </Router>
