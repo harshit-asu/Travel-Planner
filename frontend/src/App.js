@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import Contact from './components/Home/Contact';
 import { isLoggedIn } from './services/api';
 import { MDBSpinner } from 'mdb-react-ui-kit';
+import ViewProfile from './components/Profile/ViewProfile';
 
 function App() {
   const [currentUserId, setCurrentUserId] = useState(null);

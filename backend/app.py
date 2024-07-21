@@ -450,13 +450,14 @@ def get_trip_members(trip_id):
         if not is_trip_member(trip_id, g.current_user_id):
             return jsonify({'error': 'User is not a member of this trip'}), 401
 
-        stmt = select(User).join(TripMember, User.user_id == TripMember.user_id).where(TripMember.trip_id == trip_id)
+        stmt = select(User, TripMember).join(TripMember, User.user_id == TripMember.user_id).where(TripMember.trip_id == trip_id)
         print(stmt)
 
         result = db.session.execute(stmt).all()
 
         return jsonify({
             "trip_members": [{
+                "trip_member_id": row.TripMember.trip_member_id,
                 "user_id": row.User.user_id,
                 "name": f'{row.User.first_name} {row.User.last_name}'
             } for row in result]
@@ -644,7 +645,7 @@ def get_expenses(trip_id):
 @token_required
 def update_expense(expense_id):
     data = request.get_json()
-    if not data or 'split_with' not in data:
+    if not data:
         abort(400)
 
     try:
@@ -711,7 +712,7 @@ def split_expense(expense_id):
         abort(400)
 
     try:
-        expense = Expense.query.filter_by(expense_id=expense_id)
+        expense = Expense.query.filter_by(expense_id=expense_id).first()
         if not expense or expense.paid_by != g.current_user_id:
             abort(404)
 
@@ -721,9 +722,11 @@ def split_expense(expense_id):
                 new_split = ExpenseSplit(
                     expense_id=expense_id,
                     trip_member_id=split_member.trip_member_id,
-                    amount=amount
+                    amount=int(amount)
                 )
-                split_member.total_expenses += amount
+                if not split_member.total_expenses:
+                    split_member.total_expenses = 0
+                split_member.total_expenses += int(amount)
                 db.session.add(new_split)
 
         db.session.commit()
@@ -732,6 +735,25 @@ def split_expense(expense_id):
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/expenses/<int:expense_id>/splits', methods=['GET'])
+@token_required
+def get_expense_splits(expense_id):
+    try:
+        expense = Expense.query.filter_by(expense_id=expense_id).first()
+
+        return jsonify({
+            "splits": [{
+                "trip_member_id": split.trip_member_id,
+                "amount": split.amount
+            } for split in expense.splits]
+        })
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 
 
 # Destination management endpoints
