@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, abort, g
 from flask_migrate import Migrate
 from sqlalchemy.exc import SQLAlchemyError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from dotenv import load_dotenv
 import os
 import jwt
@@ -75,6 +75,15 @@ def internal_server_error(error):
 def is_trip_member(trip_id, user_id):
     return TripMember.query.filter_by(trip_id=trip_id, user_id=user_id).first() != None
 
+def get_user_name(user_id):
+    try:
+        user = User.query.filter_by(user_id=user_id).first()
+        if not user:
+            return None
+        return f"{user.first_name} {user.last_name}"
+    except Exception as e:
+        return str(e)
+
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
@@ -117,7 +126,7 @@ def login():
     # Authenticate user from database
     user = User.query.filter_by(username=data['username']).first()
     if not user or not user.check_password(data['password']):
-        return jsonify({'error': 'Invalid username or password'}), 401
+        return jsonify({'error': 'Invalid username or password'}), 200
 
     # Create JWT token
     token = jwt.encode({'user_id': user.user_id, 'exp': datetime.now().astimezone() + timedelta(days=7)}, app.config['SECRET_KEY'], algorithm="HS256")
@@ -125,6 +134,23 @@ def login():
     return jsonify({
         'message': 'User login successful',
         'token': token}), 200
+
+
+@app.route('/is-logged-in', methods=['GET'])
+@token_required
+def is_logged_in():
+    try:
+        current_user = User.query.filter_by(user_id=g.current_user_id).first()
+        if not current_user:
+            abort(404)
+        
+        return jsonify({
+            "user_id": current_user.user_id
+        }), 200
+
+    except SQLAlchemyError as error:
+        db.session.rollback()
+        return jsonify({"message": "Something went wrong during password reset", 'error': str(error)}), 500
 
 
 @app.route('/forgot-password', methods=['POST'])
@@ -200,11 +226,10 @@ def get_user(user_id):
         user = User.query.filter_by(user_id=user_id).first()
         if not user:
             abort(404)
-        print(datetime.now().astimezone().isoformat())
-        print(user.created_at)
         return jsonify({"users": [{
             "user_id": user.user_id,
             "username": user.username,
+            "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "phone_number": user.phone_number,
@@ -264,8 +289,31 @@ def update_user(user_id):
     
     except SQLAlchemyError as error:
         db.session.rollback()
-        return jsonify({"message": "Something went wrong during user deletion", 'error': str(error)}), 500
+        return jsonify({"message": "Something went wrong during user updation", 'error': str(error)}), 500
+    
 
+@app.route('/navbar', methods=['GET'])
+@token_required
+def get_user_data_for_navbar():
+    try:
+        user = User.query.filter_by(user_id=g.current_user_id).first()
+        if not user:
+            abort(404)
+
+        notifications = user.notifications
+
+        return jsonify({
+            "user_id": user.user_id,
+            "user_name": f"{user.first_name} {user.last_name}",
+            "notifications": [{
+                "notification_id": n.notification_id,
+                "message": n.message
+            } for n in notifications]
+        }), 200
+        
+    except SQLAlchemyError as error:
+        db.session.rollback()
+        return jsonify({"message": "Something went wrong during user deletion", 'error': str(error)}), 500
 
 # Trip management endpoints
 
@@ -277,10 +325,13 @@ def get_trips():
         return jsonify({'trips': [{
             "trip_id": trip.trip_id,
             "trip_name": trip.trip_name,
-            "start_date": trip.start_date,
-            "end_date": trip.end_date,
+            "start_date": trip.start_date.strftime('%d %b %Y'),
+            "end_date": trip.end_date.strftime('%d %b %Y'),
             "budget": trip.budget,
-            "created_at": trip.created_at
+            "created_at": trip.created_at,
+            "members_count": len(trip.trip_members),
+            "created_by": get_user_name(trip.created_by),
+            "previous": (trip.start_date < date.today())
         } for trip in trips]}), 200
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -301,9 +352,10 @@ def get_trip(trip_id):
         return jsonify({"trips": [{
             "trip_id": trip.trip_id,
             "trip_name": trip.trip_name,
-            "start_date": trip.start_date,
-            "end_date": trip.end_date,
+            "start_date": trip.start_date.strftime('%d %b %Y'),
+            "end_date": trip.end_date.strftime('%d %b %Y'),
             "budget": trip.budget,
+            "created_by": get_user_name(trip.created_by),
             "created_at": trip.created_at
         }]}), 200
     
@@ -399,7 +451,6 @@ def get_trip_members(trip_id):
             return jsonify({'error': 'User is not a member of this trip'}), 401
 
         stmt = select(User, TripMember).join(TripMember, User.user_id == TripMember.user_id).where(TripMember.trip_id == trip_id)
-        print(stmt)
 
         result = db.session.execute(stmt).all()
 

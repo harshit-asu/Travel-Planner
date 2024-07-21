@@ -1,4 +1,5 @@
-import axios from axios;
+import axios from 'axios';
+import { json } from 'react-router-dom';
 
 const API_URL = 'http://localhost:5000';
 
@@ -11,6 +12,16 @@ const getAuthHeader = () => {
 
 // Authentication endpoints
 
+export const isLoggedIn = () => {
+    const headers = getAuthHeader();
+    if(headers.headers.Authorization === 'null'){
+        return null
+    }
+    else{
+        return axios.get(`${API_URL}/is-logged-in`, getAuthHeader());
+    }
+}
+
 export const signup = (userData) => {
     return axios.post(`${API_URL}/signup`, userData);
 };
@@ -22,12 +33,12 @@ export const login = (username, password) => {
 export const logout = () => {
     try {
         localStorage.removeItem("access_token");
-        return JSON({
+        return json({
             "message": "Logout successful",
             "return_value": true
         });
     } catch (error) {
-        return JSON({
+        return json({
             "message": error,
             "return_value": true
         })
@@ -54,6 +65,10 @@ export const updateProfile = (userId, userData) => {
 export const deleteProfile = (userId) => {
     return axios.delete(`${API_URL}/users/${userId}`, getAuthHeader());
 };
+
+export const getUserDataForNavbar = () => {
+    return axios.get(`${API_URL}/navbar`, getAuthHeader());
+}
 
 // Trips
 export const getTrips = () => {

@@ -1,0 +1,25 @@
+.navbar-link-custom {
+    color: white !important;
+    margin: 10 !important;
+}
+
+.navbar-link-custom:hover {
+    color: black !important;
+    border-radius: 20px !important;
+    transition: ease-out !important;
+}
+
+.navbar-options {
+    width: 70% !important;
+}
+
+.username {
+    color: white !important;
+    padding-bottom: 10px !important;
+    text-transform:none;
+    font-size:medium;
+}
+
+.dropdown-custom {
+    padding: 0 !important;
+}
