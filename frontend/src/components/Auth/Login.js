@@ -58,7 +58,7 @@ const Login = props => {
                 <MDBInput wrapperClass='mb-4' label='Username' id='username' type='username' size="lg" value={username} onChange={(event) => {setUsername(event.target.value)}} required />
                 <MDBInput label='Password' id='password' type='password' size="lg" value={password} onChange={(event) => setPassword(event.target.value)} required />
                 <div className='mb-4 text-end mt-1'>
-                    <a className="small fw-light" style={{color: '#04b4bd'}} onClick={() => navigate('/forgot-password')}>Forgot password?</a>
+                    <a className="small fw-light" style={{color: '#04b4bd', cursor: 'pointer'}} onClick={() => navigate('/forgot-password')}>Forgot password?</a>
                 </div>
 
                 <MDBBtn type="submit" className="mb-4 px-5 btn-custom w-100" size="md" >Login</MDBBtn>
@@ -66,7 +66,7 @@ const Login = props => {
               </form>
 
             <div className='mt-2'>
-                <p className="fw-light">Don't have an account? <a onClick={() => navigate('/forgot-password')} style={{color: '#04b4bd'}}>Register here</a></p>
+                <p className="fw-light">Don't have an account? <a onClick={() => navigate('/signup')} style={{color: '#04b4bd', cursor: 'pointer'}}>Register here</a></p>
             </div>
               
 

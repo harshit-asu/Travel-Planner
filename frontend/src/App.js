@@ -16,7 +16,6 @@ import Contact from './components/Home/Contact';
 import { isLoggedIn } from './services/api';
 import { MDBSpinner } from 'mdb-react-ui-kit';
 import ViewProfile from './components/Profile/ViewProfile';
-import Dashboard from './components/Dashboard';
 import Loading from './components/Misc/Loading';
 
 function App() {
