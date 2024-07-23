@@ -13,7 +13,7 @@ import {
 } from 'mdb-react-ui-kit';
 import { updateProfile } from '../../services/api';
 
-const EditProfile = ({ open, close, user }) =>  {
+const EditProfile = ({ open, close, user, setAlertData, fetchUserData }) =>  {
   const [firstName, setFirstName] = useState(user.first_name);
   const [lastName, setLastName] = useState(user.last_name);
   const [phone, setPhone] = useState(user.phone_number || '');
@@ -26,7 +26,12 @@ const EditProfile = ({ open, close, user }) =>  {
       "phone_number": phone
     });
     close();
-    window.location.reload();
+    fetchUserData();
+    setAlertData({
+      showAlert: true,
+      severity: "success",
+      message: data.message
+    });
   }
 
 

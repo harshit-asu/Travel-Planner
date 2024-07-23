@@ -8,12 +8,12 @@ import {
   MDBModalTitle,
   MDBModalBody,
   MDBModalFooter,
-  MDBIcon,
   MDBRow,
   MDBCol,
 } from 'mdb-react-ui-kit';
 import { createTrip } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { getMinDate } from '../../Utils';
 
 const AddTrip = ({ open, close }) => {
   const [tripName, setTripName] = useState('');
@@ -38,24 +38,6 @@ const AddTrip = ({ open, close }) => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const getMinDate = () => {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1; //January is 0!
-    var yyyy = today.getFullYear();
-
-    if (dd < 10) {
-      dd = '0' + dd;
-    }
-
-    if (mm < 10) {
-      mm = '0' + mm;
-    } 
-        
-    today = yyyy + '-' + mm + '-' + dd;
-    return today;
   };
 
   return (

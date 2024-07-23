@@ -1,21 +1,17 @@
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import {
-  Badge,
-  Button,
   Card,
-  Navbar,
-  Nav,
-  Table,
   Container,
   Row,
   Col,
-  Form,
-  OverlayTrigger,
-  Tooltip,
 } from "react-bootstrap";
+import { useLocation, useNavigate } from 'react-router-dom';
+import Loading from './Misc/Loading';
+import { isLoggedIn } from '../services/api';
+import { useAuth } from '../AuthProvider';
 
 const data = [
   { id: 0, value: 10, label: 'Transport' },
@@ -29,6 +25,33 @@ const data = [
 const labelOffset = 20;
 
 const Dashboard = props => {
+
+  const { auth, userId } = useAuth();
+  let navigate = useNavigate();
+
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
+  useEffect(() => {
+    if(!auth && !userId){
+      setIsDataLoading(true);
+      navigate('/login', { state: {
+        alertData: {
+          showAlert: true,
+          severity: "error",
+          message: "Please login to access the dashboard!"
+      }}});
+      return;
+    }
+    if(isDataLoading){
+      // fetch data
+      setIsDataLoading(false);
+    }
+  });
+
+  if(isDataLoading){
+    return <Loading />
+  }
+
   return (
     <Container fluid>
     <Row className='p-4'>

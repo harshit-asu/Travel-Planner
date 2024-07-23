@@ -13,20 +13,36 @@ import {
 } from 'mdb-react-ui-kit';
 import EditProfile from './EditProfile';
 import { getUserProfile } from '../../services/api';
+import { useAuth } from '../../AuthProvider';
+import Loading from '../Misc/Loading';
 import { useLocation } from 'react-router-dom';
+import CustomAlert from '../Misc/CustomAlert';
 
 const ViewProfile = props => {
+  const { state } = useLocation();
   const [openAddTripModal, setOpenAddTripModal] = useState(false);
   const [user, setUser] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const location = useLocation();
-  const { currentUserId } = location.state;
+  const [alertData, setAlertData] = useState({
+    showAlert: false,
+    severity: "",
+    message: ""
+  });
+
+  const { userId } = useAuth();
 
   const fetchUserData = useCallback(async () => {
-    const { data } = await getUserProfile(currentUserId);
+    setIsDataLoading(true);
+    if(!userId){
+      return;
+    }
+    if(state?.alertData){
+      setAlertData(state?.alertData);
+    }
+    const { data } = await getUserProfile(userId);
     setUser(data.users[0]);
     setIsDataLoading(false);
-  }, [currentUserId]);
+  }, [userId]);
 
   useEffect(() => {
     fetchUserData();
@@ -38,16 +54,13 @@ const ViewProfile = props => {
 
   if(isDataLoading){
     return (
-      <div className='vh-100 align-items-center d-flex justify-content-center'>
-        <MDBSpinner role='status' color='info'>
-          <span className='visually-hidden'>Loading...</span>
-        </MDBSpinner>
-      </div>
+      <Loading />
     );
   }
   else{
     return (
       <section className="h-100" style={{ backgroundColor: '#f4f5f7' }}>
+        <CustomAlert alertData={alertData} setAlertData={setAlertData} />
         <MDBContainer className="py-4 vh-100 px-0 my-0">
           <MDBRow className="justify-content-center align-items-center h-100">
             <MDBCol lg="8" className="mb-4 mb-lg-0">
@@ -59,7 +72,7 @@ const ViewProfile = props => {
                       alt="Avatar" className="my-5" style={{ width: '80px',  }} fluid />
                     <MDBTypography tag="h5" style={{color:"white"}}>{user.username}</MDBTypography>      
                     <MDBIcon onClick={() => setOpenAddTripModal(true)} style={{color:"white", cursor: 'pointer'}} far icon="edit mb-5" />
-                      <EditProfile open={openAddTripModal} close={closeAddTripModal} user={user} />
+                      <EditProfile open={openAddTripModal} close={closeAddTripModal} user={user} setAlertData={setAlertData} fetchUserData={fetchUserData} />
                   </MDBCol>
                   <MDBCol md="8">
                     <MDBCardBody className="p-4">

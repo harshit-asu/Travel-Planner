@@ -65,3 +65,45 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #04b4bd !important;
 }
+
+/* .form-control:not(:focus)~.form-notch div:first-child {
+    box-shadow: none !important;
+    clip-path: inset(-8px 0px -8px -8px);
+}
+
+.form-control:not(:focus)~.form-notch div:nth-child(2) {
+    box-shadow: none !important;
+    clip-path: inset(0px 0px -8px 0px);
+}
+
+.form-control:not(:focus)~.form-notch div:last-child {
+    box-shadow: none !important;
+    clip-path: inset(-8px -8px -8px 0px);
+} */
+
+.form-control:focus~.form-notch .form-notch-leading {
+    border-color: #04b4bd !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(4, 180, 189, 0.6) !important;
+    clip-path: inset(-8px 0px -8px -8px);
+}
+
+.form-control:focus~.form-notch .form-notch-middle {
+    border-bottom-color: #04b4bd !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0), 0 0 8px rgba(4, 180, 189, 0.6) !important;
+    clip-path: inset(0px 0px -8px 0px);
+}
+
+.form-control:focus~.form-notch .form-notch-trailing {
+    border-color: #04b4bd !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(4, 180, 189, 0.6) !important;
+    clip-path: inset(-8px -8px -8px 0px);
+}
+
+.form-control:focus~.form-label {
+    color: #04b4bd !important;
+}
+
+input:focus {
+    border-color: #04b4bd !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0), 0 0 8px rgba(4, 180, 189, 0.6) !important;
+}

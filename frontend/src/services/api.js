@@ -12,36 +12,54 @@ const getAuthHeader = () => {
 
 // Authentication endpoints
 
-export const isLoggedIn = () => {
+export const isLoggedIn = async () => {
     const headers = getAuthHeader();
     if(headers.headers.Authorization === 'null'){
         return null
     }
     else{
-        return axios.get(`${API_URL}/is-logged-in`, getAuthHeader());
+        try {
+            const response = await axios.get(`${API_URL}/is-logged-in`, getAuthHeader());
+            return response;
+        } catch (error) {
+            console.log(error);
+            localStorage.removeItem("access_token");
+            return null;
+        }
     }
 }
 
-export const signup = (userData) => {
-    return axios.post(`${API_URL}/signup`, userData);
+export const signup = async (userData) => {
+    try {
+        const response = await axios.post(`${API_URL}/signup`, userData);
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+    }
 };
 
-export const login = (username, password) => {
-    return axios.post(`${API_URL}/login`, {username, password});
+export const login = async (username, password) => {
+    try {
+        const response = await axios.post(`${API_URL}/login`, {username, password});
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 export const logout = () => {
     try {
         localStorage.removeItem("access_token");
-        return json({
+        return {
             "message": "Logout successful",
             "return_value": true
-        });
+        };
     } catch (error) {
-        return json({
+        return {
             "message": error,
-            "return_value": true
-        })
+            "return_value": false
+        }
     }
 };
 
@@ -54,8 +72,13 @@ export const resetPassword = (password) => {
 };
 
 // User Profile
-export const getUserProfile = (userId) => {
-    return axios.get(`${API_URL}/users/${userId}`, getAuthHeader());
+export const getUserProfile = async (userId) => {
+    try {
+        const response = await axios.get(`${API_URL}/users/${userId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 export const updateProfile = (userId, userData) => {
@@ -71,24 +94,49 @@ export const getUserDataForNavbar = () => {
 }
 
 // Trips
-export const getTrips = () => {
-    return axios.get(`${API_URL}/trips`, getAuthHeader());
+export const getTrips = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/trips`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getTrip = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}`, getAuthHeader());
+export const getTrip = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const createTrip = (tripData) => {
-    return axios.post(`${API_URL}/trips`, tripData, getAuthHeader());
+export const createTrip = async (tripData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips`, tripData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const updateTrip = (tripId, tripData) => {
-    return axios.put(`${API_URL}/trips/${tripId}`, tripData, getAuthHeader());
+export const updateTrip = async (tripId, tripData) => {
+    try {
+        const response = await axios.put(`${API_URL}/trips/${tripId}`, tripData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deleteTrip = (tripId) => {
-    return axios.delete(`${API_URL}/trips/${tripId}`, getAuthHeader());
+export const deleteTrip = async (tripId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/trips/${tripId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 
@@ -114,20 +162,40 @@ export const declineInvite = (invitationId) => {
 
 // Destination endpoints
 
-export const addDestination = (tripId, destinationData) => {
-    return axios.post(`${API_URL}/trips/${tripId}/destinations`, destinationData, getAuthHeader());
+export const addDestination = async (tripId, destinationData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/destinations`, destinationData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getDestinations = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/destinations`, getAuthHeader());
+export const getDestinations = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/destinations`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 }
 
-export const updateDestination = (destinationId, destinationData) => {
-    return axios.put(`${API_URL}/destinations/${destinationId}`, destinationData, getAuthHeader());
+export const updateDestination = async (destinationId, destinationData) => {
+    try {
+        const response = await axios.put(`${API_URL}/destinations/${destinationId}`, destinationData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deleteDestination = (destinationId) => {
-    return axios.delete(`${API_URL}/destinations/${destinationId}`, getAuthHeader());
+export const deleteDestination = async (destinationId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/destinations/${destinationId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 // Activity endpoints

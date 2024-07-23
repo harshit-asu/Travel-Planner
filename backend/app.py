@@ -119,21 +119,27 @@ def signup():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    if not data or 'username' not in data or 'password' not in data:
-        abort(400)
+    try:
+        data = request.get_json()
+        if not data or 'username' not in data or 'password' not in data:
+            abort(400)
 
-    # Authenticate user from database
-    user = User.query.filter_by(username=data['username']).first()
-    if not user or not user.check_password(data['password']):
-        return jsonify({'error': 'Invalid username or password'}), 200
+        # Authenticate user from database
+        user = User.query.filter_by(username=data['username']).first()
+        if not user or not user.check_password(data['password']):
+            return jsonify({'message': 'Invalid username or password'}), 400
 
-    # Create JWT token
-    token = jwt.encode({'user_id': user.user_id, 'exp': datetime.now().astimezone() + timedelta(days=7)}, app.config['SECRET_KEY'], algorithm="HS256")
+        # Create JWT token
+        token = jwt.encode({'user_id': user.user_id, 'exp': datetime.now().astimezone() + timedelta(days=7)}, app.config['SECRET_KEY'], algorithm="HS256")
 
-    return jsonify({
-        'message': 'User login successful',
-        'token': token}), 200
+        return jsonify({
+            'message': 'User login successful',
+            'token': token,
+            "user_id": user.user_id}), 200
+    
+    except SQLAlchemyError as error:
+        db.session.rollback()
+        return jsonify({"message": "Something went wrong during sign up process", 'error': str(error)}), 500
 
 
 @app.route('/is-logged-in', methods=['GET'])
@@ -800,8 +806,10 @@ def get_destinations(trip_id):
             "destination_name": d.destination_name,
             "description": d.description,
             "place_id": d.place_id,
-            "arrival": d.arrival,
-            "departure": d.departure
+            "arrival_date": d.arrival.strftime('%d %b %Y'),
+            "arrival_time": d.arrival.strftime('%I:%M %p'),
+            "departure_date": d.departure.strftime('%d %b %Y'),
+            "departure_time": d.departure.strftime('%I:%M %p')
         } for d in destinations]}), 200
     
     except SQLAlchemyError as e:

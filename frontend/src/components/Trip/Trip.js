@@ -45,6 +45,7 @@ const Trip = props => {
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   const fetchTripData = useCallback(async () => {
+    setIsDataLoading(true);
     const { data } = await getTrip(trip_id);
     setTrip(data.trips[0]);
     setIsDataLoading(false);
@@ -52,7 +53,6 @@ const Trip = props => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setIsDataLoading(true);
     fetchTripData();
   }, [fetchTripData]);
 
@@ -130,7 +130,7 @@ const Trip = props => {
       <MDBCardBody style={{margin:'0'}}>
       <MDBRow>
         <MDBCol size='2'>
-          <MDBTabs className='flex-column text-center'>
+          <MDBTabs className='d-flex flex-grow-0 flex-column text-center'>
             <MDBTabsItem>
               <MDBTabsLink onClick={() => handleVerticalClick('Destinations')} active={verticalActive === 'Destinations'}>
               Destinations
@@ -170,7 +170,7 @@ const Trip = props => {
         </MDBCol>
         <MDBCol size='10'>
           <MDBTabsContent>
-            <MDBTabsPane open={verticalActive === 'Destinations'}><DestinationList trip_id={trip.trip_id} /></MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Destinations'}><DestinationList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Activities'}>Activities content</MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Transport'}>Transport content</MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Accomodation'}>Accomodation content</MDBTabsPane>

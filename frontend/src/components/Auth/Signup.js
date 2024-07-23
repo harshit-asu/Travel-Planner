@@ -1,5 +1,5 @@
-import React, { useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     MDBBtn,
     MDBContainer,
@@ -14,36 +14,92 @@ import {
 } from 'mdb-react-ui-kit';
 import login_page from '../../assets/login_page.jpg';
 import { signup } from '../../services/api';
+import CustomAlert from '../Misc/CustomAlert';
 
 const Signup = props => {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    
+    const { state } = useLocation();
+
+    const [signupFormData, setSignUpFormData] = useState({
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "password": "",
+        "username": ""
+    });
+    const [alertData, setAlertData] = useState(state?.alertData || {
+        "showAlert": false,
+        "severity": "",
+        "message": ""
+    });
     let navigate = useNavigate();
+
+
+    const handleFormChange = (e) => {
+        e.preventDefault();
+        try {
+            const { name, value } = e.target;
+            setSignUpFormData({
+                ...signupFormData,
+                [name]: value,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const validateData = () => {
+        if(signupFormData.password.length < 8){
+            setAlertData({
+                "showAlert": true,
+                "severity": "error",
+                "message": "Password should contain at least 8 characters."
+            });
+            return false;
+        }
+        else{
+            return true;
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(!validateData()){
+            return;
+        }
         try {
-          const response = await signup({
-            "username": username,
-            "password": password,
-            "first_name": firstName,
-            "last_name": lastName,
-            "email": email
-          });
-          setMessage(response.data.msg);
-          navigate('/login');
+            const response = await signup(signupFormData);
+            if(response.status === 201){
+                navigate('/login', {
+                    state: {
+                        "alertData": {
+                            "showAlert": true,
+                            "severity": "success",
+                            "message": response.data.message
+                        }
+                    }
+                });
+            }
+            else{
+                setAlertData({
+                    "showAlert": true,
+                    "severity": "error",
+                    "message": response.data.message
+                });
+            }
         } catch (error) {
-          setMessage(error.response.data.msg || 'Registration failed');
+            setAlertData({
+                "showAlert": true,
+                "severity": "error",
+                "message": error.response.message
+            });
         }
     };
-    
+
 
     return (
-        <MDBContainer className="my-5" style={{maxWidth: '75%'}}>
+        <MDBContainer className="my-5" style={{ maxWidth: '75%' }}>
+            <CustomAlert alertData={alertData} setAlertData={setAlertData} />
 
             <MDBCard className='' style={{ borderRadius: 30 }}>
                 <MDBRow style={{ borderRadius: 30 }}>
@@ -52,35 +108,35 @@ const Signup = props => {
                         <MDBCardImage src={login_page} alt="Travel Image" className='w-100' style={{ borderRadius: 30 }} />
                     </MDBCol>
 
-                    <MDBCol md='6' style={{ marginLeft: "3%"}}>
-                        <MDBCardBody className='d-flex flex-column align-items-center mt-4'>
+                    <MDBCol md='6' style={{ marginLeft: "3%" }} className='d-flex flex-column justify-content-center'>
+                        <MDBCardBody className='d-flex flex-column align-items-center justify-content-center flex-grow-0 gap-2'>
 
                             <div className='d-flex flex-row justify-content-center mt-1 mb-1'>
-                                <span className="h1 fw-bold mb-0">Welcome Aboard!</span>
+                                <span className="h1 fw-bold mb-0" style={{ color: '#04b4bd' }} >Welcome Aboard!</span>
                             </div>
                             <MDBRow className='mt-4'>
-                              <form className='w-80' onSubmit={handleSubmit}>
-                                  <MDBRow className='mb-4'>
-                                      <MDBCol>
-                                          <MDBInput id='first_name' label='First name' size='lg' value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                                      </MDBCol>
-                                      <MDBCol>
-                                          <MDBInput id='last_name' label='Last name' size='lg' value={lastName} onChange={(e) => setLastName(e.target.value)} required/>
-                                      </MDBCol>
-                                  </MDBRow>
-                                  <MDBInput className='mb-4' type='email' id='email' label='Email address' size='lg' value={email} onChange={(e) => setEmail(e.target.value)} required />
-                                  <MDBInput className='mb-4' type='username' id='username' label='Username' size='lg' value={username} onChange={(e) => setUsername(e.target.value)} required />
-                                  <MDBInput className='mb-4' type='password' id='password' label='Password' size='lg' value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                <form className='w-80' onSubmit={handleSubmit}>
+                                    <MDBRow className='mb-4'>
+                                        <MDBCol>
+                                            <MDBInput id='first_name' name='first_name' label='First name' size='lg' value={signupFormData.first_name} onChange={handleFormChange} required />
+                                        </MDBCol>
+                                        <MDBCol>
+                                            <MDBInput id='last_name' name='last_name' label='Last name' size='lg' value={signupFormData.last_name} onChange={handleFormChange} required />
+                                        </MDBCol>
+                                    </MDBRow>
+                                    <MDBInput className='mb-4' type='email' id='email' name='email' label='Email address' size='lg' value={signupFormData.email} onChange={handleFormChange} required />
+                                    <MDBInput className='mb-4' type='username' id='username' name='username' label='Username' size='lg' value={signupFormData.username} onChange={handleFormChange} required />
+                                    <MDBInput className='mb-4' type='password' id='password' name='password' label='Password' size='lg' value={signupFormData.password} onChange={handleFormChange} required />
 
-                                  <div className='w-100 d-flex justify-content-center'>
-                                    <MDBBtn type='submit' className="mb-2 mt-2 px-5 btn-custom w-100" size="lg">Sign in</MDBBtn>
-                                  </div>
+                                    <div className='w-100 d-flex justify-content-center'>
+                                        <MDBBtn type='submit' className="mb-2 mt-2 px-5 btn-custom w-100" size="lg">Sign Up</MDBBtn>
+                                    </div>
 
 
-                              </form>
+                                </form>
                             </MDBRow>
                             <div className='mt-3'>
-                                <p className="" style={{ color: '#000000' }}>Already have an account? <a href="/" style={{ color: '#04b4bd' }}>Login</a></p>
+                                <p className="" style={{ color: 'gray' }}>Already have an account? <Link to={'/login'} style={{ color: '#04b4bd' }} >Login</Link> </p>
                             </div>
                         </MDBCardBody>
                     </MDBCol>
@@ -90,7 +146,7 @@ const Signup = props => {
             </MDBCard>
 
         </MDBContainer>
-  )
+    )
 }
 
 export default Signup

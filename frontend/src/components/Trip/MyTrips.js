@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {
   MDBCard,
   MDBCardBody,
@@ -18,6 +18,9 @@ import MyTripsItem from "./TripListItem";
 import AddTrip from "./AddTrip";
 import { getTrips } from "../../services/api";
 import NoTrips from "./NoTrips";
+import { useAuth } from "../../AuthProvider";
+import Loading from "../Misc/Loading";
+import { useNavigate } from "react-router-dom";
 
 
 const MyTrips = () => {
@@ -25,6 +28,8 @@ const MyTrips = () => {
   const [basicActive, setBasicActive] = useState('Upcoming Trips');
   const [upcomingTrips, setUpcomingTrips] = useState([]);
   const [previousTrips, setPreviousTrips] = useState([]);
+  const { auth, userId } = useAuth();
+  const [isDataLoading, setIsDataLoading] = useState(false);
  
   const [openAddTripModal, setOpenAddTripModal] = useState(false);
 
@@ -40,7 +45,18 @@ const MyTrips = () => {
     setOpenAddTripModal(false);
   }
 
-  const fetchTrips = async () => {
+  let navigate = useNavigate();
+
+  const fetchTrips = useCallback(async () => {
+    setIsDataLoading(true);
+    if(!auth && !userId){
+      navigate('/login', { state: {
+        alertData: {
+          showAlert: true,
+          severity: "error",
+          message: "Please login to access the application!"
+      }}});
+    }
     try {
       const { data } = await getTrips();
       setTrips(data.trips);
@@ -59,11 +75,16 @@ const MyTrips = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+    setIsDataLoading(false);
+  }, [navigate, auth, userId]);
 
   useEffect(() => {
     fetchTrips();
-  }, []);
+  }, [fetchTrips]);
+
+  if(isDataLoading){
+    return <Loading />
+  }
 
   return (
     <MDBContainer fluid className="vh-100 mt-3">
