@@ -15,7 +15,7 @@ import {
 import { updateTrip } from '../../services/api';
 import { getMinDate, getDateFromString } from '../../Utils';
 
-const EditTrip = ({ open, close, trip, fetchTripData }) => {
+const EditTrip = ({ open, close, trip, fetchTripData, setAlertData }) => {
 
     const [tripName, setTripName] = useState(trip.trip_name || '');
     const [startDate, setStartDate] = useState(getDateFromString(trip.start_date) || '');
@@ -32,11 +32,30 @@ const EditTrip = ({ open, close, trip, fetchTripData }) => {
                 "end_date": endDate,
                 "budget": budget
             });
-            close();
-            fetchTripData();  
-        } catch (error) {
+            if(response.status === 200){
+              close();
+              fetchTripData();  
+              setAlertData({
+                showAlert: true,
+                severity: "success",
+                message: response.data.message
+              });
+            }
+            else{
+              setAlertData({
+                showAlert: true,
+                severity: "error",
+                message: response.data.message
+              });
+            }
+          } catch (error) {
+            setAlertData({
+              showAlert: true,
+              severity: "error",
+              message: String(error)
+            });
             console.log(error);
-        }
+          }
     };
   
   return (

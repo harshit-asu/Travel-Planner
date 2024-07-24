@@ -8,7 +8,7 @@ import {
 import no_destinations from '../../assets/no_destinations.jpg';
 import AddDestination from './AddDestination';
 
-const NoDestinations = ( {trip, open, close, setOpen} ) => {
+const NoDestinations = ( {trip, open, close, setOpen, setAlertData} ) => {
   return (
     <MDBContainer className="my-5">
         <MDBRow className='d-flex justify-content-center text-center'>
@@ -16,7 +16,7 @@ const NoDestinations = ( {trip, open, close, setOpen} ) => {
             <h2>Uh.. Oh!  No destinations added yet!</h2>
             <MDBBtn className="mt-3 btn-custom w-25" size="md" onClick={() => setOpen(true) }>Add Destination</MDBBtn>
         </MDBRow>
-        <AddDestination trip={trip} open={open} close={close} />
+        <AddDestination trip={trip} open={open} close={close} setAlertData={setAlertData} />
 
     </MDBContainer>
   );

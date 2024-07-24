@@ -21,11 +21,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Loading from '../Misc/Loading';
 import { deleteTrip, getTrip } from '../../services/api';
 import EditTrip from './EditTrip';
+import CustomAlert from '../Misc/CustomAlert';
+import ActivityList from '../Activity/ActivityList';
+import TransportList from '../Transport/TransportList';
+import AccommodationList from '../Accommodation/AccommodationList';
 
 
 const Trip = props => {
   const [verticalActive, setVerticalActive] = useState('Destinations');
   const [trip, setTrip] = useState(null);
+  const [alertData, setAlertData] = useState({
+    showAlert: false,
+    severity: "",
+    message: ""
+  });
 
   const [openEditTripModal, setOpenEditTripModal] = useState(false);
 
@@ -75,6 +84,7 @@ const Trip = props => {
 
   return (
     <MDBContainer fluid className="vh-100 mt-3">
+      <CustomAlert alertData={alertData} setAlertData={setAlertData} />
     <MDBCard >
       <MDBCardHeader className="p-3">
         <MDBRow className='w-100'>
@@ -104,7 +114,7 @@ const Trip = props => {
                                style={{color:"#04b4bd", cursor: 'pointer'}}
                             />
                           </MDBTooltip>
-                          <EditTrip open={openEditTripModal} close={closeEditTripModal} trip={trip} fetchTripData={fetchTripData} />
+                          <EditTrip open={openEditTripModal} close={closeEditTripModal} trip={trip} fetchTripData={fetchTripData} setAlertData={setAlertData} />
                           <MDBTooltip
                             tag="a"
                             wrapperProps={{ onClick: handleTripDeletion }}
@@ -171,9 +181,9 @@ const Trip = props => {
         <MDBCol size='10'>
           <MDBTabsContent>
             <MDBTabsPane open={verticalActive === 'Destinations'}><DestinationList trip={trip} /></MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'Activities'}>Activities content</MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'Transport'}>Transport content</MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'Accomodation'}>Accomodation content</MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Activities'}><ActivityList trip={trip} /></MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Transport'}><TransportList trip={trip} /></MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Accomodation'}><AccommodationList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Expenses'}>Expenses content</MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'PackingList'}>Packing List content</MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'TripMembers'}>Trip Members List content</MDBTabsPane>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import {
   MDBBtn,
   MDBModal,
@@ -9,35 +8,33 @@ import {
   MDBModalTitle,
   MDBModalBody,
   MDBModalFooter,
-  MDBRow,
-  MDBCol,
 } from 'mdb-react-ui-kit';
-import { addTransport } from '../../services/api';
-import { getMinDate, getDateFromString } from '../../Utils';
+import { updateTransport } from '../../services/api';
+import { getMinDate, getDateFromString, convertTo24Hour } from '../../Utils';
 
-const AddTransport= ({ trip, open, close, fetchTransports, setAlertData }) =>  {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [arrivalLocation, setArrivalLocation] = useState('');
-  const [departureLocation, setDepartureLocation] = useState('');
-  const [modeOfTransport, setModeOfTransport] = useState('');
-  const [description, setDescription] = useState('');
-  const [cost, setCost] = useState('');
+const EditTransport = ({ d, trip, open, close, fetchTransports, setAlertData }) =>  {
 
-  const handleAddTransport = async (e) => {
+  const [startDate, setStartDate] = useState(`${getDateFromString(d.departure_date)}T${convertTo24Hour(d.departure_time)}`);
+  const [endDate, setEndDate] = useState(`${getDateFromString(d.arrival_date)}T${convertTo24Hour(d.arrival_time)}`);
+  const [arrivalLocation, setArrivalLocation] = useState(d.arrival_location);
+  const [departureLocation, setDepartureLocation] = useState(d.departure_location);
+  const [modeOfTransport, setModeOfTransport] = useState(d.mode_of_transport);
+  const [description, setDescription] = useState(d.description);
+  const [cost, setCost] = useState(d.cost);
+
+  const handleEditTransport = async (e) => {
     e.preventDefault();
     try {
-      const response = await addTransport(trip.trip_id, {
-        "arrival_time": `${endDate}:00`,
-        "departure_time": `${startDate}:00`,
+      const response = await updateTransport(d.transport_id, {
+        "arrival_time": `${endDate}`,
+        "departure_time": `${startDate}`,
         "description": description,
         "arrival_location": arrivalLocation,
         "departure_location": departureLocation,
         "mode_of_transport": modeOfTransport,
         "cost": cost
       });
-      console.log(response.data.message);
-      if(response.status === 201){
+      if(response.status === 200){
         close();
         fetchTransports();
         setAlertData({
@@ -71,10 +68,10 @@ const AddTransport= ({ trip, open, close, fetchTransports, setAlertData }) =>  {
             <MDBModalTitle style={{color: 'white'}}>New Transport</MDBModalTitle>
             <MDBBtn className='btn-close' color='none' onClick={close}></MDBBtn>
           </MDBModalHeader>
-          <form onSubmit={handleAddTransport}>
+          <form onSubmit={handleEditTransport}>
             <MDBModalBody className='d-flex flex-column gap-3 flex-grow-0'>
               
-              <div className="form-outline">
+            <div className="form-outline">
                 <label htmlFor="transport_name" className='m-1'>Mode of Transport <span style={{color: 'red'}}>*</span></label>
                 <input type="text" className="form-control" id="transport_name" style={{border: '1px solid lightgray'}} required value={modeOfTransport} onChange={(e) => setModeOfTransport(e.target.value)} />
               </div>
@@ -86,7 +83,7 @@ const AddTransport= ({ trip, open, close, fetchTransports, setAlertData }) =>  {
             
                 <div className="form-outline datepicker">
                   <label htmlFor="start_date" className='m-1'>Departure Time<span style={{color: 'red'}}>*</span></label>
-                  <input type="datetime-local" className="form-control" id="start_date" style={{border: '1px solid lightgray'}} required value={startDate} onChange={(e) => setStartDate(e.target.value)} min={`${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
+                  <input type="datetime-local" className="form-control" id="start_date" style={{border: '1px solid lightgray'}} required value={startDate} onChange={(e) => setStartDate(`${e.target.value}:00`)} min={`${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
                 </div>
 
                 <div className="form-outline">
@@ -96,7 +93,7 @@ const AddTransport= ({ trip, open, close, fetchTransports, setAlertData }) =>  {
 
                 <div className="form-outline datepicker">
                   <label htmlFor="end_date" className='m-1'>Arrival Time<span style={{color: 'red'}}>*</span></label>
-                  <input type="datetime-local" className="form-control" id="end_date" style={{border: '1px solid lightgray'}} required value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate || `${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
+                  <input type="datetime-local" className="form-control" id="end_date" style={{border: '1px solid lightgray'}} required value={endDate} onChange={(e) => setEndDate(`${e.target.value}:00`)} min={startDate || `${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
                 </div>
 
               <div className="form-outline">
@@ -109,7 +106,6 @@ const AddTransport= ({ trip, open, close, fetchTransports, setAlertData }) =>  {
                 <textarea type="textarea" className="form-control" id="budget" style={{border: '1px solid lightgray'}} value={description} onChange={(e) => setDescription(e.target.value)} />
               </div>
 
-
             </MDBModalBody>
             <MDBModalFooter className='d-flex justify-content-center'>
               <MDBBtn className='btn-custom' type='submit'>Save</MDBBtn>
@@ -121,6 +117,4 @@ const AddTransport= ({ trip, open, close, fetchTransports, setAlertData }) =>  {
   )
 }
 
-AddTransport.propTypes = {}
-
-export default AddTransport
+export default EditTransport;

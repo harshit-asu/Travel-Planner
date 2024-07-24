@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import {
   MDBBtn,
   MDBModal,
@@ -9,30 +8,27 @@ import {
   MDBModalTitle,
   MDBModalBody,
   MDBModalFooter,
-  MDBRow,
-  MDBCol,
 } from 'mdb-react-ui-kit';
-import { addActivity } from '../../services/api';
-import { getMinDate, getDateFromString } from '../../Utils';
+import { updateActivity } from '../../services/api';
+import { getMinDate, getDateFromString, convertTo24Hour } from '../../Utils';
 
-const AddActivity= ({ trip, open, close, fetchActivities, setAlertData }) =>  {
+const EditActivity = ({ d, trip, open, close, fetchActivities, setAlertData }) =>  {
 
-  const [activityName, setActivityName] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [description, setDescription] = useState('');
+  const [activityName, setActivityName] = useState(d.activity_name);
+  const [startDate, setStartDate] = useState(`${getDateFromString(d.start_date)}T${convertTo24Hour(d.start_time)}`);
+  const [endDate, setEndDate] = useState(`${getDateFromString(d.end_date)}T${convertTo24Hour(d.end_time)}`);
+  const [description, setDescription] = useState(d.description);
 
-  const handleAddActivity = async (e) => {
+  const handleEditActivity = async (e) => {
     e.preventDefault();
     try {
-      const response = await addActivity(trip.trip_id, {
+      const response = await updateActivity(d.activity_id, {
         "activity_name": activityName,
-        "start_time": `${startDate}:00`,
-        "end_time": `${endDate}:00`,
+        "start_time": `${startDate}`,
+        "end_time": `${endDate}`,
         "description": description
       });
-      console.log(response.data.message);
-      if(response.status === 201){
+      if(response.status === 200){
         close();
         fetchActivities();
         setAlertData({
@@ -66,7 +62,7 @@ const AddActivity= ({ trip, open, close, fetchActivities, setAlertData }) =>  {
             <MDBModalTitle style={{color: 'white'}}>New Activity</MDBModalTitle>
             <MDBBtn className='btn-close' color='none' onClick={close}></MDBBtn>
           </MDBModalHeader>
-          <form onSubmit={handleAddActivity}>
+          <form onSubmit={handleEditActivity}>
             <MDBModalBody className='d-flex flex-column gap-3 flex-grow-0'>
               
               <div className="form-outline">
@@ -76,12 +72,12 @@ const AddActivity= ({ trip, open, close, fetchActivities, setAlertData }) =>  {
             
                 <div className="form-outline datepicker">
                   <label htmlFor="start_date" className='m-1'>Start Time <span style={{color: 'red'}}>*</span></label>
-                  <input type="datetime-local" className="form-control" id="start_date" style={{border: '1px solid lightgray'}} required value={startDate} onChange={(e) => setStartDate(e.target.value)} min={`${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
+                  <input type="datetime-local" className="form-control" id="start_date" style={{border: '1px solid lightgray'}} required value={startDate} onChange={(e) => setStartDate(`${e.target.value}:00`)} min={`${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
                 </div>
 
                 <div className="form-outline datepicker">
                   <label htmlFor="end_date" className='m-1'>End Time <span style={{color: 'red'}}>*</span></label>
-                  <input type="datetime-local" className="form-control" id="end_date" style={{border: '1px solid lightgray'}} required value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate || `${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
+                  <input type="datetime-local" className="form-control" id="end_date" style={{border: '1px solid lightgray'}} required value={endDate} onChange={(e) => setEndDate(`${e.target.value}:00`)} min={startDate || `${getDateFromString(trip.start_date)}T00:00`} max={`${getDateFromString(trip.end_date)}T23:59`} />
                 </div>
 
               <div className="form-outline">
@@ -101,6 +97,4 @@ const AddActivity= ({ trip, open, close, fetchActivities, setAlertData }) =>  {
   )
 }
 
-AddActivity.propTypes = {}
-
-export default AddActivity
+export default EditActivity;

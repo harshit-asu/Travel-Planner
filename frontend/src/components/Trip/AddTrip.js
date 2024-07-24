@@ -15,7 +15,7 @@ import { createTrip } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { getMinDate } from '../../Utils';
 
-const AddTrip = ({ open, close }) => {
+const AddTrip = ({ open, close, fetchTrips, setAlertData }) => {
   const [tripName, setTripName] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -24,7 +24,7 @@ const AddTrip = ({ open, close }) => {
   let navigate = useNavigate();
 
   const handleAddTrip = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
       const response = await createTrip({
         "trip_name": tripName,
@@ -32,10 +32,28 @@ const AddTrip = ({ open, close }) => {
         "end_date": endDate,
         "budget": budget
       });
-      console.log(response); 
-      navigate('/trips');
-      window.location.reload();
+      if(response.status === 201){
+        close();
+        fetchTrips();
+        setAlertData({
+          showAlert: true,
+          severity: "success",
+          message: response.data.message
+        });
+      }
+      else{
+        setAlertData({
+          showAlert: true,
+          severity: "error",
+          message: response.data.message
+        });
+      }
     } catch (error) {
+      setAlertData({
+        showAlert: true,
+        severity: "error",
+        message: String(error)
+      });
       console.log(error);
     }
   };

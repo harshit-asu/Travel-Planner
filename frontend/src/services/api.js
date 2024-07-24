@@ -200,58 +200,118 @@ export const deleteDestination = async (destinationId) => {
 
 // Activity endpoints
 
-export const addActivity = (tripId, activityData) => {
-    return axios.post(`${API_URL}/trips/${tripId}/activities`, activityData, getAuthHeader());
+export const addActivity = async (tripId, activityData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/activities`, activityData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getActivities = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/activities`, getAuthHeader());
+export const getActivities = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/activities`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 }
 
-export const updateActivity = (activityId, activityData) => {
-    return axios.put(`${API_URL}/activities/${activityId}`, activityData, getAuthHeader());
+export const updateActivity = async (activityId, activityData) => {
+    try {
+        const response = await axios.put(`${API_URL}/activities/${activityId}`, activityData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deleteActivity = (activityId) => {
-    return axios.delete(`${API_URL}/activities/${activityId}`, getAuthHeader());
+export const deleteActivity = async (activityId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/activities/${activityId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 
 // Transport endpoints
 
-export const addTransport = (tripId, transportData) => {
-    return axios.post(`${API_URL}/trips/${tripId}/transports`, transportData, getAuthHeader());
+export const addTransport = async (tripId, transportData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/transports`, transportData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getTransports = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/transports`, getAuthHeader());
+export const getTransports = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/transports`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 }
 
-export const updateTransport = (transportId, transportData) => {
-    return axios.put(`${API_URL}/transports/${transportId}`, transportData, getAuthHeader());
+export const updateTransport = async (transportId, transportData) => {
+    try {
+        const response = await axios.put(`${API_URL}/transports/${transportId}`, transportData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deleteTransport = (transportId) => {
-    return axios.delete(`${API_URL}/transports/${transportId}`, getAuthHeader());
+export const deleteTransport = async (transportId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/transports/${transportId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 
 // Accommodation endpoints
 
-export const addAccommodation = (tripId, accommodationData) => {
-    return axios.post(`${API_URL}/trips/${tripId}/accommodations`, accommodationData, getAuthHeader());
+export const addAccommodation = async (tripId, accommodationData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/accommodations`, accommodationData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getAccommodations = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/accommodations`, getAuthHeader());
+export const getAccommodations = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/accommodations`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 }
 
-export const updateAccommodations = (accommodationId, accommodationData) => {
-    return axios.put(`${API_URL}/accommodations/${accommodationId}`, accommodationData, getAuthHeader());
+export const updateAccommodation = async (accommodationId, accommodationData) => {
+    try {
+        const response = await axios.put(`${API_URL}/accommodations/${accommodationId}`, accommodationData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deleteAccommodations = (accommodationId) => {
-    return axios.delete(`${API_URL}/accommodations/${accommodationId}`, getAuthHeader());
+export const deleteAccommodation = async (accommodationId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/accommodations/${accommodationId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 

@@ -73,7 +73,7 @@ const DestinationListItem = ({trip, d, fetchDestinations, setAlertData}) => {
                   </MDBDropdown>
                 </MDBCol>
               </MDBRow>
-              <MDBRow className='mt-3' >
+              <MDBRow className='mt-2' >
                 <MDBCol md={5} className="ms-1 d-flex flex-column justify-content-center flex-grow-0">
                     <h5 style={{ color: 'gray' }}><MDBIcon fas icon="plane-arrival" className='me-2' style={{color: '#04b4bd'}} /> Arrival </h5>
                     <div className='ms-1 mt-1 d-flex flex-row justify-content-start flex-grow-0 gap-4'>

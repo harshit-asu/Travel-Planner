@@ -21,6 +21,7 @@ import NoTrips from "./NoTrips";
 import { useAuth } from "../../AuthProvider";
 import Loading from "../Misc/Loading";
 import { useNavigate } from "react-router-dom";
+import CustomAlert from "../Misc/CustomAlert";
 
 
 const MyTrips = () => {
@@ -30,7 +31,11 @@ const MyTrips = () => {
   const [previousTrips, setPreviousTrips] = useState([]);
   const { auth, userId } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(false);
- 
+  const [alertData, setAlertData] = useState({
+    showAlert: false,
+    severity: "",
+    message: ""
+  });
   const [openAddTripModal, setOpenAddTripModal] = useState(false);
 
   const handleBasicClick = (value) => {
@@ -88,6 +93,7 @@ const MyTrips = () => {
 
   return (
     <MDBContainer fluid className="vh-100 mt-3">
+      <CustomAlert alertData={alertData} setAlertData={setAlertData} />
       <MDBCard>
         <MDBCardHeader className="p-3">
           <MDBRow>
@@ -108,7 +114,7 @@ const MyTrips = () => {
               >
                 Add Trip
               </MDBBtn>
-              <AddTrip open={openAddTripModal} close={closeAddTripModal} />
+              <AddTrip open={openAddTripModal} close={closeAddTripModal} setAlertData={setAlertData} fetchTrips={fetchTrips} />
             </MDBCol>
           </MDBRow>
         </MDBCardHeader>

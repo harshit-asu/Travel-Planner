@@ -908,8 +908,10 @@ def get_activities(trip_id):
             "activity_id": activity.activity_id,
             "activity_name": activity.activity_name,
             "destination_id": activity.destination_id,
-            "start_time": activity.start_time,
-            "end_time": activity.end_time,
+            "start_date": activity.start_time.strftime('%d %b %Y') if activity.start_time else None,
+            "start_time": activity.start_time.strftime('%I:%M %p') if activity.start_time else None,
+            "end_date": activity.end_time.strftime('%d %b %Y') if activity.end_time else None,
+            "end_time": activity.end_time.strftime('%I:%M %p') if activity.end_time else None,
             "description": activity.description
         } for activity in activities]}), 200
     
@@ -1003,13 +1005,15 @@ def get_transports(trip_id):
         
         transports = Transport.query.filter_by(trip_id=trip_id).all()
 
-        return jsonify({'transport': [{
+        return jsonify({'transports': [{
             "transport_id": t.transport_id,
             "mode_of_transport": t.mode_of_transport,
             "departure_location": t.departure_location,
             "arrival_location": t.arrival_location,
-            "departure_time": t.departure_time,
-            "arrival_time": t.arrival_time,
+            "departure_date": t.departure_time.strftime('%d %b %Y'),
+            "departure_time": t.departure_time.strftime('%I:%M %p'),
+            "arrival_date": t.arrival_time.strftime('%d %b %Y'),
+            "arrival_time": t.arrival_time.strftime('%I:%M %p'),
             "cost": t.cost,
             "description": t.description
         } for t in transports]}), 200
@@ -1111,8 +1115,10 @@ def get_accommodations(trip_id):
             "accommodation_id": a.accommodation_id,
             "accommodation_name": a.accommodation_name,
             "destination_id": a.destination_id,
-            "check_in": a.check_in,
-            "check_out": a.check_out,
+            "check_in_date": a.check_in.strftime('%d %b %Y'),
+            "check_in_time": a.check_in.strftime('%I:%M %p'),
+            "check_out_date": a.check_out.strftime('%d %b %Y'),
+            "check_out_time": a.check_out.strftime('%I:%M %p'),
             "cost": a.cost,
             "description": a.description
         } for a in accommodations]}), 200
