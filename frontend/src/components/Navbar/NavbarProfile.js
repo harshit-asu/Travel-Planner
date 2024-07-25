@@ -74,7 +74,7 @@ const NavbarProfile = props => {
             <MDBNavbarItem>
                 <MDBDropdown>
                     <MDBDropdownToggle className='dropdown-custom'>
-                        <span className="fw-bold mt-0 me-2 username">{userName}</span>
+                        <span className="fw-bold mt-0 me-2 username">{userName}</span>  
                         <MDBIcon fas icon="chevron-circle-down  ms-8 " style={{ color: 'white' }} />
                     </MDBDropdownToggle>
                     <MDBDropdownMenu>

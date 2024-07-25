@@ -142,22 +142,61 @@ export const deleteTrip = async (tripId) => {
 
 // Trip Members endpoint
 
-export const getTripMembers = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/trip-members`, getAuthHeader());
+export const getTripMembers = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/trip-members`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+};
+
+export const getPendingInvitations = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/pending-invitations`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 // Invitation endpoints
 
-export const sendInvite = (tripId, inviteeId) => {
-    return axios.post(`${API_URL}/trips/${tripId}/invitations`, { inviteeId }, getAuthHeader());
+export const getUserInvitations = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/invitations`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const acceptInvite = (invitationId) => {
-    return axios.put(`${API_URL}/invitations/${invitationId}`, {}, getAuthHeader());
+
+export const sendInvite = async (tripId, inviteeUsername) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/invitations`, { "invitee_username": inviteeUsername }, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const declineInvite = (invitationId) => {
-    return axios.delete(`${API_URL}/invitations/${invitationId}`, {}, getAuthHeader());
+export const acceptInvite = async (invitationId) => {
+    try {
+        const response = await axios.put(`${API_URL}/invitations/${invitationId}/accept`, {}, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+};
+
+export const declineInvite = async (invitationId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/invitations/${invitationId}/decline`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 // Destination endpoints

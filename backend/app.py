@@ -471,42 +471,87 @@ def get_trip_members(trip_id):
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/trips/<int:trip_id>/pending-invitations', methods=['GET'])
+@token_required
+def get_pending_invitations(trip_id):
+    try:
+        trip = Trip.query.filter_by(trip_id=trip_id).first()
+        if not trip or trip.created_by != g.current_user_id:
+            abort(404)
+
+        if not is_trip_member(trip_id, g.current_user_id):
+            return jsonify({'error': 'User is not a member of this trip'}), 401
+
+        users = [invitation.recipient for invitation in TripInvitation.query.filter_by(trip_id=trip_id).all()]
+        print(users)
+
+        return jsonify({
+            "pending_invitations": [{
+                "user_id": user.user_id,
+                "name": f"{user.first_name} {user.last_name}",
+            } for user in users]
+        })
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 # Invitation management endpoints
+
+@app.route('/invitations', methods=['GET'])
+@token_required
+def get_user_invitations():
+    try:
+        user = User.query.filter_by(user_id=g.current_user_id).first()
+        invitations = user.invitations_received
+    
+        return jsonify({"invitations": [{
+            "trip_invitation_id": inv.trip_invitation_id,
+            "sender_name": get_user_name(inv.sender_id),
+            "invitation_sent_at": inv.invitation_sent_at,
+            "trip_name": inv.trip.trip_name
+        } for inv in invitations]}), 200
+    
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/trips/<int:trip_id>/invitations', methods=['POST'])
 @token_required
 def invite_to_trip(trip_id):
     data = request.get_json()
-    if not data or 'invitee_id' not in data:
+    if not data or 'invitee_username' not in data:
         abort(400)
 
     try:
         # Check if invitee exists and is not already a member
-        invitee = User.query.filter_by(user_id=data['invitee_id']).first()
+        invitee = User.query.filter_by(username=data['invitee_username']).first()
         if not invitee:
             abort(404)
 
-        existing_member = TripMember.query.filter_by(trip_id=trip_id, user_id=data['invitee_id']).first()
+        existing_member = TripMember.query.filter_by(trip_id=trip_id, user_id=invitee.user_id).first()
         if existing_member:
             return jsonify({'message': 'User is already a member of this trip'}), 200
         
-        invitation_exists = TripInvitation.query.filter_by(trip_id=trip_id, receiver_id=data['invitee_id']).first()
+        invitation_exists = TripInvitation.query.filter_by(trip_id=trip_id, receiver_id=invitee.user_id).first()
         if invitation_exists:
             return jsonify({"message": "Invitation already exists"}), 200
 
         new_invitation = TripInvitation(
             trip_id=trip_id,
             sender_id=g.current_user_id,
-            receiver_id=data['invitee_id']
+            receiver_id=invitee.user_id
         )
         db.session.add(new_invitation)
         db.session.commit()
 
         # create a new notification
         new_notification = Notification(
-            user_id=data['invitee_id'],
+            user_id=invitee.user_id,
             message=f"You have a new trip invitation."
         )
         db.session.add(new_notification)
@@ -530,7 +575,7 @@ def accept_invitation(trip_invitation_id):
         # invitation expired
         if invitation.expiry_at < datetime.now():
             db.session.delete(invitation)
-            return jsonify({"message": "Invitation expired"}), 201
+            return jsonify({"message": "Invitation expired"}), 200
 
         # Add user to trip members
         new_member = TripMember(
@@ -543,7 +588,7 @@ def accept_invitation(trip_invitation_id):
         db.session.delete(invitation)
 
         db.session.commit()
-        return jsonify({'message': 'Invitation accepted successfully'}), 200
+        return jsonify({'message': 'Invitation accepted successfully'}), 201
     
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -572,7 +617,7 @@ def decline_invitation(trip_invitation_id):
         db.session.add(new_notification)
 
         db.session.commit()
-        return jsonify({'message': 'Invitation declined successfully'}), 200
+        return jsonify({'message': 'Invitation declined successfully'}), 201
     
     except SQLAlchemyError as e:
         db.session.rollback()

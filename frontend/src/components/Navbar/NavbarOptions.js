@@ -14,7 +14,7 @@ const NavbarOptions = props => {
 
   return (
     <div className='navbar-options'>
-      <MDBNavbarNav className="me-4 mb-2 mb-lg-0 d-flex justify-content-around">
+      <MDBNavbarNav className="me-4 mb-2 mb-lg-0 d-flex justify-content-around fw-bold">
         <MDBNavbarItem>
           <MDBNavbarLink onClick={() => navigate('/')} className='navbar-link-custom'>
             Home

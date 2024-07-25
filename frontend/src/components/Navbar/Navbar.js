@@ -22,7 +22,7 @@ const Navbar = props => {
     <MDBNavbar expand='lg' dark style={{ backgroundColor: '#04b4bd' }} sticky>
       <MDBContainer fluid className='d-flex mx-4 px-4 flex-column align-items-center'>
         <MDBRow className='w-100 d-flex justify-content-between'>
-          <MDBCol md='4'>
+          <MDBCol md='3'>
             <MDBNavbarBrand onClick={() => {auth ? navigate('/dashboard') : navigate('/')}} style={{cursor: 'pointer'}}  >
               <div className='d-flex flex-row justify-content-end align-items-center'>
                 <MDBIcon fas icon="umbrella-beach fa-2x me-3" style={{ color: 'white' }} />
@@ -30,7 +30,7 @@ const Navbar = props => {
               </div>
             </MDBNavbarBrand>
           </MDBCol>
-          <MDBCol md='5' className='d-flex flex-row justify-content-center align-items-center'>
+          <MDBCol md='6' className='d-flex flex-row justify-content-center align-items-center'>
             {(!auth) ? <NavbarOptions /> : <NavbarSearch />}
           </MDBCol>
           <MDBCol md='3' className='d-flex flex-row justify-content-end align-items-center'>

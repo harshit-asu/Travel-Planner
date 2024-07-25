@@ -25,6 +25,8 @@ import CustomAlert from '../Misc/CustomAlert';
 import ActivityList from '../Activity/ActivityList';
 import TransportList from '../Transport/TransportList';
 import AccommodationList from '../Accommodation/AccommodationList';
+import PackingList from '../PackingList/PackingList';
+import TripMemberList from '../TripMember/TripMemberList';
 
 
 const Trip = props => {
@@ -100,37 +102,37 @@ const Trip = props => {
             <h5 className="mb-0 ms-4 ps-2 mt-3" style={{ color: 'grey' }}> <strong>{trip.start_date} - {trip.end_date}</strong></h5>
           
           </MDBCol>
-          <MDBCol md={4} className="d-flex justify-content-end pe-5 py-3">
-                            <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ onClick: () => setOpenEditTripModal(true) }}
-                            title="Edit"
-                          >
-                            <MDBIcon
-                               fas
-                               icon="pencil-alt"
-                               size="lg"
-                               className="me-3"
-                               style={{color:"#04b4bd", cursor: 'pointer'}}
-                            />
-                          </MDBTooltip>
-                          <EditTrip open={openEditTripModal} close={closeEditTripModal} trip={trip} fetchTripData={fetchTripData} setAlertData={setAlertData} />
-                          <MDBTooltip
-                            tag="a"
-                            wrapperProps={{ onClick: handleTripDeletion }}
-                            title="Delete"
-                          >
-                            <MDBIcon
-                              fas
-                              icon="trash-alt"
-                              color="danger"
-                              size="lg"
-                              className="me-3"
-                              style={{ cursor: 'pointer' }}
-                            />
-                            </MDBTooltip>
+            <MDBCol md={4} className="d-flex justify-content-end pe-5 py-3">
+              <MDBTooltip
+                tag="a"
+                wrapperProps={{ onClick: () => setOpenEditTripModal(true) }}
+                title="Edit"
+              >
+                <MDBIcon
+                  fas
+                  icon="pencil-alt"
+                  size="lg"
+                  className="me-3"
+                  style={{ color: "#04b4bd", cursor: 'pointer' }}
+                />
+              </MDBTooltip>
+              <EditTrip open={openEditTripModal} close={closeEditTripModal} trip={trip} fetchTripData={fetchTripData} setAlertData={setAlertData} />
+              <MDBTooltip
+                tag="a"
+                wrapperProps={{ onClick: handleTripDeletion }}
+                title="Delete"
+              >
+                <MDBIcon
+                  fas
+                  icon="trash-alt"
+                  color="danger"
+                  size="lg"
+                  className="me-3"
+                  style={{ cursor: 'pointer' }}
+                />
+              </MDBTooltip>
 
-          </MDBCol>
+            </MDBCol>
           <MDBCol>
 
           </MDBCol>
@@ -141,6 +143,11 @@ const Trip = props => {
       <MDBRow>
         <MDBCol size='2'>
           <MDBTabs className='d-flex flex-grow-0 flex-column text-center'>
+            <MDBTabsItem>
+              <MDBTabsLink onClick={() => handleVerticalClick('TripMembers')} active={verticalActive === 'TripMembers'}>
+              Trip Members
+              </MDBTabsLink>
+            </MDBTabsItem>
             <MDBTabsItem>
               <MDBTabsLink onClick={() => handleVerticalClick('Destinations')} active={verticalActive === 'Destinations'}>
               Destinations
@@ -157,8 +164,8 @@ const Trip = props => {
               </MDBTabsLink>
             </MDBTabsItem>
             <MDBTabsItem>
-              <MDBTabsLink onClick={() => handleVerticalClick('Accomodation')} active={verticalActive === 'Accomodation'}>
-              Accomodation
+              <MDBTabsLink onClick={() => handleVerticalClick('Accommodation')} active={verticalActive === 'Accommodation'}>
+              Accommodation
               </MDBTabsLink>
             </MDBTabsItem>
             <MDBTabsItem>
@@ -171,11 +178,6 @@ const Trip = props => {
               Packing List
               </MDBTabsLink>
             </MDBTabsItem>
-            <MDBTabsItem>
-              <MDBTabsLink onClick={() => handleVerticalClick('TripMembers')} active={verticalActive === 'TripMembers'}>
-              Trip Members
-              </MDBTabsLink>
-            </MDBTabsItem>
           </MDBTabs>
         </MDBCol>
         <MDBCol size='10'>
@@ -183,10 +185,10 @@ const Trip = props => {
             <MDBTabsPane open={verticalActive === 'Destinations'}><DestinationList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Activities'}><ActivityList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Transport'}><TransportList trip={trip} /></MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'Accomodation'}><AccommodationList trip={trip} /></MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Accommodation'}><AccommodationList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Expenses'}>Expenses content</MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'PackingList'}>Packing List content</MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'TripMembers'}>Trip Members List content</MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'PackingList'}><PackingList trip={trip} /></MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'TripMembers'}><TripMemberList trip={trip} /></MDBTabsPane>
           </MDBTabsContent>
         </MDBCol>
       </MDBRow>

@@ -95,7 +95,7 @@ const MyTrips = () => {
     <MDBContainer fluid className="vh-100 mt-3">
       <CustomAlert alertData={alertData} setAlertData={setAlertData} />
       <MDBCard>
-        <MDBCardHeader className="p-3">
+        <MDBCardHeader className="mx-4 p-3">
           <MDBRow>
             <MDBCol
               md={8}
@@ -120,7 +120,7 @@ const MyTrips = () => {
         </MDBCardHeader>
         {/* <MDBScrollbar style={{ position: "relative", height: "400px" }}> */}
         <MDBCardBody>
-          <MDBRow className="m-2">
+          {/* <MDBRow className="m-2">
             <MDBCol
               className="mx-3 px-4"
               style={{ border: "1.5px solid #808080", borderRadius: "50px" }}
@@ -167,8 +167,8 @@ const MyTrips = () => {
                 </MDBCol>
               </MDBRow>
             </MDBCol>
-          </MDBRow>
-          <MDBRow className="m-4 rounded">
+          </MDBRow> */}
+          <MDBRow className="mt-2 m-4 rounded">
             <MDBCard>
               <MDBCardHeader>
                 <MDBTabs>
@@ -207,7 +207,7 @@ const MyTrips = () => {
                   </MDBTabsPane>
                   <MDBTabsPane open={basicActive === "Previous Trips"}>
                     <div className="d-flex flex-wrap">
-                      {(previousTrips.length !== 0) ? previousTrips.map((trip) => <MDBCol md={4} key={trip.trip_id}><MyTripsItem trip={trip} /></MDBCol>) : <NoTrips previous={true} />}
+                      {(previousTrips.length !== 0) ? previousTrips.map((trip) => <MDBCol md={4} key={trip.trip_id}><MyTripsItem trip={trip} previous={true} /></MDBCol>) : <NoTrips previous={true} />}
                     </div> 
                   </MDBTabsPane>
                 </MDBTabsContent>

@@ -16,6 +16,7 @@ import ViewProfile from './components/Profile/ViewProfile';
 import { useAuth } from './AuthProvider';
 import { useCallback, useEffect, useState } from 'react';
 import Loading from './components/Misc/Loading';
+import InvitationsList from './components/Invitation/InvitationsList';
 
 function App() {
   const { auth } = useAuth();
@@ -54,6 +55,7 @@ function App() {
           <Route path="/trips" element={<MyTrips auth={auth} />} />
           <Route path='/trips/:trip_id' element={<Trip auth={auth} />} />
           <Route path='/profile' element={ <ViewProfile auth={auth} /> } />
+          <Route path='/invitations' element={ <InvitationsList auth={auth} /> } />
         </Routes>
       </Router>
     </div>
