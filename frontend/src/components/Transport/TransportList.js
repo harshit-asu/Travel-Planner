@@ -66,7 +66,7 @@ const TransportList = ({ trip }) => {
           </MDBRow>
         </MDBCardHeader>
         <MDBCardBody>
-          { (transports.length !== 0) ? transports.map((d) => <TransportListItem key={d.destination_id} d={d} fetchTransports={fetchTransports} setAlertData={setAlertData} trip={trip} /> ) : <NoTransport trip={trip} open={openAddTransportModal} close={closeAddTransportModal} setOpen={setOpenAddTransportModal} setAlertData={setAlertData} />}
+          { (transports.length !== 0) ? transports.map((d) => <TransportListItem key={d.destination_id} d={d} fetchTransports={fetchTransports} setAlertData={setAlertData} trip={trip} /> ) : <NoTransport trip={trip} open={openAddTransportModal} close={closeAddTransportModal} setOpen={setOpenAddTransportModal} setAlertData={setAlertData} fetchTransports={fetchTransports} />}
         </MDBCardBody>
       </MDBCard>
     </MDBContainer>

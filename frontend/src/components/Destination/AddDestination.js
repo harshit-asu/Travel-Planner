@@ -51,7 +51,7 @@ const AddDestination= ({ trip, open, close, fetchDestinations, setAlertData }) =
       setAlertData({
         showAlert: true,
         severity: "error",
-        message: error.response.message
+        message: String(error)
       });
       console.log(error);
     }

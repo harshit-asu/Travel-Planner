@@ -327,7 +327,8 @@ def get_user_data_for_navbar():
 @token_required
 def get_trips():
     try:
-        trips = Trip.query.filter_by(created_by=g.current_user_id).all()
+        trip_memberships = User.query.filter_by(user_id=g.current_user_id).first().trip_memberships
+        trips = [tm.trip for tm in trip_memberships]
         return jsonify({'trips': [{
             "trip_id": trip.trip_id,
             "trip_name": trip.trip_name,

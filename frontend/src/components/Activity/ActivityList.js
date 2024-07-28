@@ -66,7 +66,7 @@ const ActivityList = ({ trip }) => {
           </MDBRow>
         </MDBCardHeader>
         <MDBCardBody>
-          { (activities.length !== 0) ? activities.map((d) => <ActivityListItem key={d.destination_id} d={d} fetchActivities={fetchActivities} setAlertData={setAlertData} trip={trip} /> ) : <NoActivity trip={trip} open={openAddActivityModal} close={closeAddActivityModal} setOpen={setOpenAddActivityModal} setAlertData={setAlertData} />}
+          { (activities.length !== 0) ? activities.map((d) => <ActivityListItem key={d.destination_id} d={d} fetchActivities={fetchActivities} setAlertData={setAlertData} trip={trip} /> ) : <NoActivity trip={trip} open={openAddActivityModal} close={closeAddActivityModal} setOpen={setOpenAddActivityModal} setAlertData={setAlertData} fetchActivities={fetchActivities} />}
         </MDBCardBody>
       </MDBCard>
     </MDBContainer>

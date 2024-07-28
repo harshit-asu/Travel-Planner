@@ -356,20 +356,40 @@ export const deleteAccommodation = async (accommodationId) => {
 
 // PackingList endpoints
 
-export const addPackingList = (tripId, packingListData) => {
-    return axios.post(`${API_URL}/trips/${tripId}/packing-lists`, packingListData, getAuthHeader());
+export const addPackingList = async (tripId, packingListData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/packing-lists`, packingListData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getPackingLists = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/packing-lists`, getAuthHeader());
+export const getPackingLists = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/packing-lists`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 }
 
-export const updatePackingList = (packingListId, packingListData) => {
-    return axios.put(`${API_URL}/packing-lists/${packingListId}`, packingListData, getAuthHeader());
+export const updatePackingList = async (packingListId, packingListData) => {
+    try {
+        const response = await axios.put(`${API_URL}/packing-lists/${packingListId}`, packingListData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deletePackingList = (packingListId) => {
-    return axios.delete(`${API_URL}/packing-lists/${packingListId}`, getAuthHeader());
+export const deletePackingList = async (packingListId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/packing-lists/${packingListId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 
