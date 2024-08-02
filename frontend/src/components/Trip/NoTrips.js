@@ -9,7 +9,7 @@ import {
 import no_trips from '../../assets/no_trips.jpg'
 import AddTrip from './AddTrip';
 
-const NoTrips = ({ previous }) => {
+const NoTrips = ({ previous, setAlertData }) => {
   const [openAddTripModal, setOpenAddTripModal] = useState(false);
   return (
     <MDBContainer className="my-5">
@@ -18,7 +18,7 @@ const NoTrips = ({ previous }) => {
             {(previous) ? <h2>No previous trips!</h2> : <h2>Uh.. Oh!  No trips added yet!</h2>}
             {(!previous) && <MDBBtn className="mt-3 btn-custom w-25" size="md" onClick={() => setOpenAddTripModal(true)}>Add Trip</MDBBtn>}
         </MDBRow>
-        <AddTrip open={openAddTripModal} close={() => setOpenAddTripModal(false)} />
+        <AddTrip open={openAddTripModal} close={() => setOpenAddTripModal(false)} setAlertData={setAlertData} />
 
     </MDBContainer>
   );

@@ -314,7 +314,7 @@ def get_user_data_for_navbar():
             "notifications": [{
                 "notification_id": n.notification_id,
                 "message": n.message
-            } for n in notifications]
+            } for n in notifications if not n.is_read]
         }), 200
         
     except SQLAlchemyError as error:
@@ -643,7 +643,7 @@ def add_expense(trip_id):
             paid_by=g.current_user_id,
             category=data['category'],
             amount=data['amount'],
-            expense_date=datetime.strptime(data.get('expense_date', str(datetime.now().date())), '%Y-%m-%d').date(),
+            expense_date=datetime.strptime(data['expense_date'].split('T')[0], '%Y-%m-%d').date(),
             description=data.get('description')
         )
         db.session.add(new_expense)
@@ -679,8 +679,8 @@ def get_expenses(trip_id):
         expenses = Expense.query.filter_by(trip_id=trip_id).all()
     
         return jsonify({'expenses': [{
-            "expense_id": expense.expense_id,
-            "paid_by": expense.paid_by,
+            "id": expense.expense_id,
+            "paid_by": get_user_name(expense.paid_by),
             "category": expense.category,
             "amount": expense.amount,
             "expense_date": expense.expense_date,
@@ -746,7 +746,7 @@ def delet_expense(expense_id):
         db.session.delete(expense)    
         db.session.commit()
 
-        return jsonify({"message": "Expense deleted successfully"}), 201
+        return jsonify({"message": "Expense deleted successfully"}), 200
 
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -1242,7 +1242,7 @@ def create_packing_list(trip_id):
         db.session.add(new_packing_list)
         db.session.commit()
 
-        return jsonify({'message': 'Packing list created successfully', 'packing_list_id': new_packing_list.packing_list_id}), 201
+        return jsonify({'message': 'Packing list item added successfully', 'packing_list_id': new_packing_list.packing_list_id}), 201
     
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -1259,10 +1259,10 @@ def get_packing_lists(trip_id):
         packing_lists = PackingList.query.filter_by(trip_id=trip_id).all()
 
         return jsonify({'packing_lists': [{
-            "packing_list_id": pl.packing_list_id,
+            "id": pl.packing_list_id,
             "item_name": pl.item_name,
             "quantity": pl.quantity,
-            "packed": pl.packed
+            "packed": "Packed" if pl.packed else "Not packed"
         } for pl in packing_lists]}), 200
     
     except SQLAlchemyError as e:
@@ -1278,17 +1278,17 @@ def update_packing_list(packing_list_id):
         abort(400)
 
     try:
-        packing_list = PackingList.query.filter_by(packing_list_id=packing_list_id)
-        if not packing_list or packing_list.created_by != g.current_user_id:
+        packing_list = PackingList.query.filter_by(packing_list_id=packing_list_id).first()
+        if not packing_list:
             abort(404)
 
         packing_list.item_name = data.get('item_name', packing_list.item_name)
         packing_list.quantity = data.get('quantity', packing_list.quantity)
-        packing_list.packed = data.get('packed', packing_list.packed)
+        packing_list.packed = data.get('packed') == 'Packed' if data.get('packed') else packing_list.packed
 
         db.session.commit()
 
-        return jsonify({'message': 'Packing list updated successfully', 'packing_list_id': packing_list.packing_list_id}), 200
+        return jsonify({'message': 'Packing list item updated successfully', 'packing_list_id': packing_list.packing_list_id}), 200
     
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -1299,14 +1299,14 @@ def update_packing_list(packing_list_id):
 @token_required
 def delete_packing_list(packing_list_id):
     try:
-        packing_list = PackingList.query.filter_by(packing_list_id=packing_list_id)
-        if not packing_list or packing_list.created_by != g.current_user_id:
+        packing_list = PackingList.query.filter_by(packing_list_id=packing_list_id).first()
+        if not packing_list:
             abort(404)
 
         db.session.delete(packing_list)
         db.session.commit()
 
-        return jsonify({'message': 'Packing list deleted successfully'}), 200
+        return jsonify({'message': 'Packing list item deleted successfully'}), 200
     
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -1329,6 +1329,23 @@ def get_user_notifications(user_id):
                 "is_read": n.is_read
             } for n in user.notifications]
         }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/notifications', methods=['PUT'])
+@token_required
+def mark_notifications_read():
+    try:
+        notifications = Notification.query.filter_by(user_id=g.current_user_id).all()
+        for n in notifications:
+            n.is_read = True
+
+        db.session.commit()
+
+        return jsonify({"message": "User notifications marked as read"}), 200
 
     except SQLAlchemyError as e:
         db.session.rollback()

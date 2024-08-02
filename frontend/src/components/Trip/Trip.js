@@ -27,6 +27,7 @@ import TransportList from '../Transport/TransportList';
 import AccommodationList from '../Accommodation/AccommodationList';
 import PackingList from '../PackingList/PackingList';
 import TripMemberList from '../TripMember/TripMemberList';
+import ExpenseList from '../Expense/ExpenseList';
 
 
 const Trip = props => {
@@ -186,7 +187,7 @@ const Trip = props => {
             <MDBTabsPane open={verticalActive === 'Activities'}><ActivityList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Transport'}><TransportList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'Accommodation'}><AccommodationList trip={trip} /></MDBTabsPane>
-            <MDBTabsPane open={verticalActive === 'Expenses'}>Expenses content</MDBTabsPane>
+            <MDBTabsPane open={verticalActive === 'Expenses'}><ExpenseList trip={trip} /> </MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'PackingList'}><PackingList trip={trip} /></MDBTabsPane>
             <MDBTabsPane open={verticalActive === 'TripMembers'}><TripMemberList trip={trip} /></MDBTabsPane>
           </MDBTabsContent>

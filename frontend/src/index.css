@@ -107,3 +107,10 @@ input:focus {
     border-color: #04b4bd !important;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0), 0 0 8px rgba(4, 180, 189, 0.6) !important;
 }
+
+.notification-item {
+    --mdb-card-header-border-width: 2px;
+    --mdb-card-header-border-color: whitesmoke;
+    border-bottom: var(--mdb-card-header-border-width) solid var(--mdb-card-header-border-color);
+    background-color: rgb(245, 245, 245, 0.5);
+}

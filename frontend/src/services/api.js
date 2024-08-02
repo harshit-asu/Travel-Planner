@@ -93,6 +93,15 @@ export const getUserDataForNavbar = () => {
     return axios.get(`${API_URL}/navbar`, getAuthHeader());
 }
 
+export const markNotificationsRead = async () => {
+    try {
+        const response = await axios.put(`${API_URL}/notifications`, {}, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
 // Trips
 export const getTrips = async () => {
     try {
@@ -395,20 +404,40 @@ export const deletePackingList = async (packingListId) => {
 
 // Expense endpoints
 
-export const addExpense = (tripId, expenseData) => {
-    return axios.post(`${API_URL}/trips/${tripId}/expenses`, expenseData, getAuthHeader());
+export const addExpense = async (tripId, expenseData) => {
+    try {
+        const response = await axios.post(`${API_URL}/trips/${tripId}/expenses`, expenseData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const getExpenses = (tripId) => {
-    return axios.get(`${API_URL}/trips/${tripId}/expenses`, getAuthHeader());
+export const getExpenses = async (tripId) => {
+    try {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/expenses`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const updateExpense = (expenseId, expenseData) => {
-    return axios.put(`${API_URL}/expenses/${expenseId}`, expenseData, getAuthHeader());
+export const updateExpense = async (expenseId, expenseData) => {
+    try {
+        const response = await axios.put(`${API_URL}/expenses/${expenseId}`, expenseData, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
-export const deleteExpense = (expenseId) => {
-    return axios.delete(`${API_URL}/expenses/${expenseId}`, getAuthHeader());
+export const deleteExpense = async (expenseId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/expenses/${expenseId}`, getAuthHeader());
+        return response;
+    } catch (error) {
+        return error.response;
+    }
 };
 
 
