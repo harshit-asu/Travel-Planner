@@ -493,7 +493,7 @@ def get_pending_invitations(trip_id):
                 "user_id": user.user_id,
                 "name": f"{user.first_name} {user.last_name}",
             } for user in users]
-        })
+        }), 200
 
     except SQLAlchemyError as e:
         db.session.rollback()

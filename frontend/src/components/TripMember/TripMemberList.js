@@ -72,7 +72,9 @@ const TripMemberList = ({ trip }) => {
         setIsDataLoading(true);
         try {
             const response = await getPendingInvitations(trip.trip_id);
-            setPending(response.data.pending_invitations);
+            if(response.status === 200){
+                setPending(response.data.pending_invitations);
+            }
         } catch (error) {
             console.log(error);
         }
