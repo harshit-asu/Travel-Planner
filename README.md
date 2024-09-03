@@ -2,6 +2,9 @@
 
 Comprehensive Trip Manager is a web application designed to help users plan trips efficiently. It allows users to manage all aspects of a trip, including destinations, activities, accommodations, transport, packing lists, and expenses. The app also supports collaboration by enabling users to invite others to join and contribute to trip planning.
 
+https://github.com/user-attachments/assets/9de0e0d8-7495-4258-9a10-bd27c9245a78
+
+
 ## Table of Contents
 
 - [Features](#features)
